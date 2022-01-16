@@ -1,0 +1,84 @@
+<script setup lang="ts">
+import { Icon } from '@iconify/vue';
+import { computed, ref } from 'vue';
+
+const props = defineProps<{
+  file: any,
+}>()
+
+const type = computed(() => {
+  return props.file.mimetype.split('/')[0];
+});
+
+const src = computed(() => {
+  return props.file.url_private;
+});
+
+</script>
+
+<template>
+  <div class="file-preview">
+    <video v-if="type === 'video'" :src="src" controls></video>
+    <a v-else :href="src" target="_blank">
+      <img v-if="type === 'image'" :src="src" :alt="props.file.name" />
+      <div v-else class="unknown-preview">
+        <icon icon="mdi:file-download-outline" style="font-size: 48px;" />
+        <div class="file-name">{{ props.file.name }}</div>
+      </div>
+    </a>
+  </div>
+</template>
+
+<style scoped>
+
+.file-preview {
+  display: inline-block;
+  height: 360px;
+}
+
+.file-preview a {
+  display: inline-block;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.file-preview a:hover {
+  text-decoration: none;
+}
+
+.file-preview video {
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.file-preview img {
+  max-height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.unknown-preview {
+  height: 100%;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eee;
+  border-radius: 8px;
+  flex-direction: column;
+}
+
+.unknown-preview:hover {
+  background: #ddd;
+}
+
+.unknown-preview .file-name {
+  font-size: 12px;
+  padding: 8px;
+}
+
+</style>
