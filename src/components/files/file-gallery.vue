@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
-import { computed, ref } from 'vue';
-import FilePreview from './file-preview.vue';
 
 const props = defineProps<{
-  files: any[],
-}>()
+  files: FileObject[]
+}>();
 
 const isHidden = ref(false);
 
 const displayName = computed(() => {
-  if (props.files.length === 1) {
-    return props.files[0].name;
-  }
+  if (props.files.length === 1) return props.files[0].name;
+
   return `${props.files.length} Files`;
 });
 
@@ -22,7 +18,7 @@ const displayName = computed(() => {
   <div class="file-list">
     <div class="file-list-header">
       <span class="file-list-header-title">
-        {{displayName}}
+        {{ displayName }}
       </span>
       <span class="file-list-header-actions">
         <icon :icon="`mdi:chevron-${isHidden ? 'right' : 'down'}-circle`" @click="isHidden = !isHidden" />

@@ -1,29 +1,25 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import Popper from 'vue3-popper';
-import emoji from '../../util/emoji';
 
+const store = useStore();
 const props = defineProps<{
-  users: any,
-  react: any,
-}>()
+  react: Reaction
+}>();
 
 const colonEmoji = computed(() => `:${props.react.name}:`);
 const emojiHtml = computed(() => emoji.replace_colons(colonEmoji.value));
 const src = computed(() => emojiHtml.value.match(/https?:\/\/[^)]+/)?.[0]);
 
 const userNames = computed(() => {
-  let names = props.react.users.map((userId: string, i: number) => {
-    const user = props.users[userId];
+  let names = props.react.userIds.map((userId: string, i: number) => {
+    const user = store.users[userId];
     let prefix = '';
-    if (i !== 0 && i === props.react.users.length - 1) {
-      prefix = 'and ';
-    }
-    return `${prefix}${user?.profile?.display_name || user?.profile?.real_name || user?.name}`;
+    if (i !== 0 && i === props.react.userIds.length - 1) prefix = 'and ';
+
+    return `${prefix}${user?.name}`;
   }).filter(Boolean).sort().slice(0, 10).join(', ');
-  if (props.react.users.length > 10) {
-    names += ` +${props.react.users.length - 10} more`;
-  }
+  if (props.react.userIds.length > 10) names += ` +${props.react.userIds.length - 10} more`;
+
   return names;
 });
 
@@ -32,18 +28,18 @@ const userNames = computed(() => {
 <template>
   <popper placement="top" hover arrow>
     <div class="react-chip">
-      <span v-html="emojiHtml"></span>
+      <span v-html="emojiHtml" />
       <span class="react-count">
-        {{react.count}}
+        {{ react.count }}
       </span>
     </div>
     <template #content>
       <div class="react-popper-content">
         <img :src="src" :alt="react.name">
         <br>
-        <strong class="names">{{userNames}}</strong>
+        <strong class="names">{{ userNames }}</strong>
         reacted with
-        <strong>{{colonEmoji}}</strong>
+        <strong>{{ colonEmoji }}</strong>
       </div>
     </template>
   </popper>

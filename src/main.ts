@@ -1,16 +1,25 @@
-import { createApp } from 'vue'
-import { ObserveVisibility } from 'vue-observe-visibility'
-import App from './App.vue'
+import { Buffer } from 'buffer';
+import './global.d.ts';
+import { createApp } from 'vue';
+import { ObserveVisibility } from 'vue-observe-visibility';
+import { createPinia } from 'pinia';
+import router from './router';
+import App from './App.vue';
 import './util/dayjs';
 import 'emoji-js/lib/emoji.css';
+import './global.css';
+
+window.Buffer = Buffer;
 
 createApp(App)
-  .directive("observe-visibility", {
+  .directive('observe-visibility', {
     beforeMount: (el, binding, vnode) => {
-      (vnode as any).context = binding.instance
-      ObserveVisibility.bind(el, binding, vnode)
+      (vnode as any).context = binding.instance;
+      ObserveVisibility.bind(el, binding, vnode);
     },
     updated: ObserveVisibility.update,
     unmounted: ObserveVisibility.unbind,
   })
-  .mount('#app')
+  .use(createPinia())
+  .use(router)
+  .mount('#app');

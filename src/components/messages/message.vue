@@ -1,64 +1,58 @@
 <script setup lang="ts">
-import dayjs from 'dayjs';
-import { computed, ref } from 'vue';
 import formatMessage from '../../util/formatMessage';
-import Gallery from '../files/gallery.vue';
-import ReactChip from './react-chip.vue';
-import RepliesButton from './replies-button.vue';
 
 const messages = ref([] as any[]);
+const store = useStore();
 
 const props = defineProps<{
-  users: any,
-  channels: any[],
-  message: any,
-  aboveMessage: any | null,
-}>()
+  message: Message
+  aboveMessage: Message | null
+  hideDateRule?: boolean
+}>();
+
+const timestamp = computed(() => {
+  return dayjs(props.message?.ts);
+});
 
 const isNewDate = computed(() => {
-  const cDate = dayjs(props.message.ts * 1000).format('YYYY-MM-DD');
-  const aDate = dayjs(props.aboveMessage?.ts * 1000).format('YYYY-MM-DD');
+  const cDate = dayjs(props.message.ts).format('YYYY-MM-DD');
+  const aDate = timestamp.value.format('YYYY-MM-DD');
   return !props.aboveMessage || cDate !== aDate;
 });
 
 const isContinued = computed(() => {
-  return !isNewDate.value && props.message.user === props.aboveMessage?.user;
-});
-
-const timestamp = computed(() => {
-  return dayjs((props.message?.ts || 0) * 1000);
+  return !isNewDate.value && props.message.userId === props.aboveMessage?.userId;
 });
 
 const user = computed(() => {
-  return props.message.user_profile
-    || props.users[props.message.user]?.profile;
+  return store.users[props.message.userId];
 });
 
 const justEmoji = computed(() => {
-  return props.message.text.match(/^:[+a-z0-9_-]+:$/i);
+  return props.message.text.match(/^(:[+a-z0-9_-]+:)+$/i);
 });
 
 </script>
 
 <template>
-  <div :id="message.client_msg_id">
-    <div v-if="isNewDate" class="message-list-date-wrap">
+  <div :id="`message-${message.id}`">
+    <div v-if="isNewDate && !hideDateRule" class="message-list-date-wrap">
       <hr>
       <div class="message-list-date">
-        {{timestamp.format('MMMM Do, YYYY')}}
+        {{ timestamp.format('MMMM Do, YYYY') }}
       </div>
     </div>
-    <div :class="{ message: true, continued: isContinued }" v-if="message">
+    <div v-if="message" :class="{ message: true, continued: isContinued }">
       <div class="message-left">
         <div v-if="!isContinued" class="message-avatar">
-          <img :src="user?.image_72" alt="">
+          <img :src="user?.image72" alt="">
         </div>
-        <span v-else>{{timestamp.format('h:mm')}}</span>
+        <span v-else>{{ timestamp.format('h:mm') }}</span>
       </div>
       <div class="message-main">
         <div v-if="!isContinued" class="message-header">
           <span class="message-author">
-            {{ user?.display_name || user?.real_name || user?.name }}
+            {{ user?.name }}
           </span>
           <span class="message-timestamp">
             {{ timestamp?.format('h:mm a').toUpperCase() }}
@@ -67,22 +61,19 @@ const justEmoji = computed(() => {
         <div
           v-if="message.text"
           :class="{ 'message-content': true, 'just-emoji': justEmoji }"
-          v-html="formatMessage(message.text, users, channels)"
-        >
-        </div>
-        <gallery v-if="message.files?.length" :files="message.files" />
+          v-html="formatMessage(message.text, store.users, store.channels)"
+        />
+        <file-gallery v-if="message.files?.length" :files="message.files" />
         <div v-if="message.reactions?.length" class="message-reactions">
           <react-chip
             v-for="reaction in message.reactions"
             :key="reaction.name"
             :react="reaction"
-            :users="users"
           />
         </div>
         <replies-button
-          v-if="message.replies?.length"
+          v-if="message.replyCount"
           :message="message"
-          :users="users"
         />
       </div>
     </div>
@@ -138,6 +129,7 @@ const justEmoji = computed(() => {
 .message-main {
   padding-left: 8px;
   overflow-wrap: anywhere;
+  flex: 1;
 }
 
 .message-author {

@@ -26,12 +26,12 @@ const parseText = (text: string, users: any, channels: any[]) => {
       return lines.map((line: string, i: number) => {
         let html = '';
         const aboveLine = lines[i - 1];
-        const belowLine = lines[i + 1];
+        // const belowLine = lines[i + 1];
         const isFirstLine = i === 0;
         const isLastLine = i === lines.length - 1;
         if (aboveLine && count(aboveLine, ulSplitRegExp) !== count(line, ulSplitRegExp)) html += '</ul>';
         if (isFirstLine || count(aboveLine, ulSplitRegExp) !== count(line, ulSplitRegExp)) {
-          html += `<ul data-indent="${Math.round(count(line, ulSplitRegExp)/4)}">`;
+          html += `<ul data-indent="${Math.round(count(line, ulSplitRegExp) / 4)}">`;
         }
         html += `<li>${line.split(ulSplitRegExp)[2].trim()}</li>`;
         if (isLastLine) {
@@ -49,7 +49,7 @@ const parseText = (text: string, users: any, channels: any[]) => {
       return escapeText(`<span class="mention">@${mention}</span>`);
     })
     .replace(/<#(C[\w\^]+)>/g, (match: string, channelId: string) => {
-      const channel = channels.find((c : any) => c.id === channelId);
+      const channel = channels.find((c: any) => c.id === channelId);
       return escapeText(channel ? `<a class="mention" href="#${channel.name}">#${channel.name}</a>` : match);
     })
     .replace(/<(https?:\/\/[^<|>]+)\|?([^<>]+)?>/g, (match: string, href: string, alt: string) => {
@@ -71,7 +71,8 @@ export default (text: string, users: any, channels: any[]) => {
       return text.split('`').map((part: string, j: number) => {
         if (j % 2 === 0) {
           return parseText(part, users, channels);
-        } else {
+        }
+        else {
           return `<code>${part}</code>`;
         }
       }).join('');

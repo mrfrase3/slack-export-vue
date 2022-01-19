@@ -1,25 +1,22 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import dayjs from 'dayjs';
-import { Icon } from '@iconify/vue';
 
+const store = useStore();
 const props = defineProps<{
-  users: any,
-  message: any,
+  message: Message
 }>();
 
 const replyUserImgs = computed(() => {
-  return props.message.reply_users.map((userId: string) => {
-    const user = props.users[userId];
+  return props.message.replyUserIds?.map((userId: string) => {
+    const user = store.users[userId];
     return {
-      src: user.profile.image_24 || user.profile.image_72,
-      alt: user.profile.display_name || user.profile.real_name || user.name,
+      src: user.image24 || user.image72,
+      alt: user.name,
     };
-  }).splice(0, 5);
+  }).splice(0, 5) || [];
 });
 
 const latest = computed(() => {
-  return dayjs(props.message.latest_reply * 1000);
+  return dayjs(props.message.latestReply);
 });
 
 </script>
@@ -27,11 +24,11 @@ const latest = computed(() => {
 <template>
   <a class="replies-btn">
     <div class="user-avatars">
-      <img v-for="(userImg, i) in replyUserImgs" :key="i" v-bind="userImg" >
+      <img v-for="(userImg, i) in replyUserImgs" :key="i" v-bind="userImg">
     </div>
     <div class="replies-count">
       <span class="replies-count-text">
-        {{ message.reply_count }}
+        {{ message.replyCount }}
         replies
       </span>
     </div>

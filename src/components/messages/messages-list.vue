@@ -1,29 +1,21 @@
 <script setup lang="ts">
 import debounce from 'lodash/debounce';
 import formatMessage from '../../util/formatMessage';
-import Message from './message.vue';
-import { computed, nextTick, ref, watch } from 'vue';
+
+const store = useStore();
+const route = useRoute();
 
 const step = 30;
 const skip = ref(step);
 const scrollId = ref('');
 const loading = ref(true);
 
-const props = defineProps<{
-  users: any,
-  channels: any[],
-  currentChannel: string,
-}>()
-
 const channel = computed(() => {
-  return props.channels.find(c => c.name === props.currentChannel) || {
-    name: '',
-    rootMessages: [],
-  };
+  return store.channels?.find((c: Channel) => c.name === route.params?.channelName);
 });
 
 const messages = computed(() => {
-  return channel.value.rootMessages.slice(channel.value.rootMessages.length - skip.value);
+  return channel.value?.rootMessages?.slice(channel.value.rootMessages.length - skip.value) || [];
 });
 
 const scrollToBottom = () => {
@@ -39,22 +31,19 @@ const scrollToBottomDebounced = debounce(() => {
 const getMoreMessages = () => {
   if (loading.value) return;
   const div = window.document.getElementById('message-list-content');
-  if (channel.value.rootMessages.length && (div?.scrollTop || 0) < 5) {
-    scrollId.value = messages.value[0]?.client_msg_id;
+  if (channel.value?.rootMessages?.length && (div?.scrollTop || 0) < 5) {
+    scrollId.value = `message-${messages.value[0]?.id}`;
     skip.value = Math.min(skip.value + step, channel.value.rootMessages.length);
   }
 };
 
 const getMoreMessagesDebounced = debounce(getMoreMessages, 200);
 
-const aboveMessage = (i : number) => {
-  if (i > 0) {
-    return messages.value[i - 1];
-  }
+const aboveMessage = (i: number) => {
+  if (i > 0) return messages.value[i - 1];
+
   return null;
 };
-
-const noop = () => {};
 
 watch(channel, () => {
   loading.value = true;
@@ -73,13 +62,13 @@ watch(channel, () => {
 watch(messages, () => {
   if (scrollId.value) {
     const div = window.document.getElementById(scrollId.value);
-    if (div) {
-      div.scrollIntoView(true);
-    }
+    if (div) { div.scrollIntoView(true); }
+
     setTimeout(() => {
       scrollId.value = '';
     }, 50);
-  } else if (loading.value) {
+  }
+  else if (loading.value) {
     scrollToBottom();
     scrollToBottomDebounced();
     setTimeout(() => {
@@ -94,28 +83,27 @@ watch(messages, () => {
   <div class="message-list">
     <div class="message-list-header">
       <div class="message-list-header-title">
-        #{{channel.name}}
+        #{{ channel?.name }}
         <div
-          v-if="channel?.topic?.value"
+          v-if="channel?.topic"
           class="message-list-header-topic"
-          v-html="formatMessage(channel?.topic?.value, users, channels)"
-        ></div>
+          v-html="formatMessage(channel?.topic, store.users, store.channels)"
+        />
       </div>
-      <div class="message-list-header-actions">
-      </div>
+      <div class="message-list-header-actions" />
     </div>
     <div id="message-list-content">
       <div
-        v-if="!scrollId && !loading && channel.rootMessages.length > skip"
-        class="top"
+        v-if="!scrollId && !loading && (channel?.rootMessages?.length || 0) > skip"
         v-observe-visibility="{ callback: getMoreMessagesDebounced, throttle: 300 }"
+        class="top"
       >
         <button @click="getMoreMessages">
           Load more
         </button>
       </div>
       <div
-        v-if="channel.rootMessages.length === skip"
+        v-if="(channel?.rootMessages?.length || 0) === skip"
         class="no-messages"
       >
         No more messages to show, this is the beginning of the channel.
@@ -123,8 +111,6 @@ watch(messages, () => {
       <message
         v-for="(message, i) in messages"
         :key="message.ts"
-        :users="users"
-        :channels="channels"
         :message="message"
         :above-message="aboveMessage(i)"
       />

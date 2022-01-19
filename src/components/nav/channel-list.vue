@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 
-const props = defineProps<{
-  channels: any[],
-  currentChannel: string,
-}>()
+const store = useStore();
+const route = useRoute();
 
-const emit = defineEmits(['update:currentChannel'])
+const isActive = (channel: Channel) => {
+  return route.params.channelName === channel.name;
+};
 
 </script>
 
@@ -16,15 +15,14 @@ const emit = defineEmits(['update:currentChannel'])
       Channels
     </div>
     <ul>
-      <li v-for="channel in channels" :key="channel.name">
-        <a
-          :href="`#${channel.name}`"
-          :class="{ active: currentChannel === channel.name }"
-          @click.prevent="emit('update:currentChannel', channel.name)"
+      <li v-for="channel in store.channels" :key="channel.name">
+        <router-link
+          :to="`/channel/${channel.name}`"
+          :class="{ link: true, active: isActive(channel) }"
         >
           <span style="padding-right: 8px;">#</span>
           {{ channel.name }}
-        </a>
+        </router-link>
       </li>
     </ul>
   </div>
@@ -47,7 +45,7 @@ li {
   list-style: none;
 }
 
-a {
+.link {
   display: block;
   padding-left: 16px;
   padding-right: 16px;
@@ -59,11 +57,11 @@ a {
   transition: background-color 0.2s ease;
 }
 
-a:hover {
+.link:hover {
   background-color: #350D36;
 }
 
-a.active {
+.link.active {
   background-color: #1164a3;
 }
 </style>

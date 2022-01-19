@@ -9,18 +9,19 @@ Currently to use it, you need to:
 
 ## TO DO:
 
-- [ ] Add in vue-router
-- [ ] Add in vuex?
+- [x] Add in vue-router
+- [x] Add in vuex?
 - [ ] Add a view for a messages reply thread
   - [ ] Allow externally linking to a message thread view
 - [ ] Add in search functionality
 - [ ] Add in a view for a user profile
   - [ ] Allow externally linking to a user profile view
-- [ ] Switch to pre-processing the export and save it as a [binary file](https://github.com/sitegui/js-binary)
-  - [ ] Unpack binary file instead, regress data structure
-  - [ ] Make sure sensitive data is not exposed (slack exports emails and phone numbers, etc)
-- [ ] Propperly setup types with typescript
-- [ ] Setup a Linter :/
+- [x] Switch to pre-processing the export and save it as a [binary file](https://github.com/sitegui/js-binary)
+  - [x] Unpack binary file instead, regress data structure
+  - [x] Make sure sensitive data is not exposed (slack exports emails and phone numbers, etc)
+  - [x] Have a UI flow for creating the binary, with config options
+- [x] Propperly setup types with typescript
+- [x] Setup a Linter :/
 - [ ] Finish message rendering
   - [ ] Support ordered lists
   - [ ] Support Blockquotesgit 

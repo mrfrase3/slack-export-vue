@@ -4,3 +4,4 @@ dist
 dist-ssr
 *.local
 public/export.zip
+public/*.bin

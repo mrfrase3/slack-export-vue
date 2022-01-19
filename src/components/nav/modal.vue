@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -7,9 +6,9 @@ const dialog = ref(false);
 const unloaded = ref(true);
 
 const props = withDefaults(defineProps<{
-  modelValue?: boolean,
-  maxWidth?: number | string,
-  persistent?: boolean,
+  modelValue?: boolean
+  maxWidth?: number | string
+  persistent?: boolean
 }>(), {
   modelValue: undefined,
   maxWidth: 500,
@@ -20,18 +19,13 @@ const useInternal = computed(() => typeof props.modelValue === 'undefined');
 const isOpen = computed(() => useInternal.value ? dialog.value : props.modelValue);
 
 const toggleOpen = (val = true) => {
-  console.log('click');
-  if (useInternal.value) {
-    dialog.value = val;
-  } else {
-    emit('update:modelValue', val);
-  }
+  if (useInternal.value) { dialog.value = val; }
+
+  else { emit('update:modelValue', val); }
 };
 
 watch(isOpen, (val) => {
-  if (val) {
-    unloaded.value = false;
-  }
+  if (val) { unloaded.value = false; }
 });
 
 </script>
@@ -47,7 +41,7 @@ watch(isOpen, (val) => {
     <div v-if="!unloaded" v-show="isOpen" class="modal-mask" @click.stop="!persistent && toggleOpen(false)">
       <div class="modal-wrapper">
         <div
-          :style="{ maxWidth: (typeof maxWidth === 'number') ? `${maxWidth}px` : maxWidth }" 
+          :style="{ maxWidth: (typeof maxWidth === 'number') ? `${maxWidth}px` : maxWidth }"
           class="modal-container"
           @click.stop=""
         >

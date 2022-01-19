@@ -1,26 +1,24 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
-import { computed, ref } from 'vue';
 
 const props = defineProps<{
-  file: any,
-}>()
+  file: FileObject
+}>();
 
 const type = computed(() => {
-  return props.file.mimetype.split('/')[0];
+  return props.file.mimeType.split('/')[0];
 });
 
 const src = computed(() => {
-  return props.file.url_private;
+  return props.file.src;
 });
 
 </script>
 
 <template>
   <div class="file-preview">
-    <video v-if="type === 'video'" :src="src" controls></video>
+    <video v-if="type === 'video'" :src="src" controls />
     <a v-else :href="src" target="_blank">
-      <img v-if="type === 'image'" :src="src" :alt="props.file.name" />
+      <img v-if="type === 'image'" :src="src" :alt="props.file.name">
       <div v-else class="unknown-preview">
         <icon icon="mdi:file-download-outline" style="font-size: 48px;" />
         <div class="file-name">{{ props.file.name }}</div>

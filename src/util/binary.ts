@@ -1,0 +1,57 @@
+import { Type } from 'js-binary';
+
+export default new Type({
+  users: [{
+    'id': 'string',
+    'name': 'string',
+    'image?': 'string',
+    'image72?': 'string',
+    'image24?': 'string',
+  }],
+  channels: [{
+    'id': 'string',
+    'name': 'string',
+    'isArchived': 'boolean',
+    'isGeneral': 'boolean',
+    'topic?': 'string',
+    'purpose?': 'string',
+    'pinnedMessageIds?': ['uint'],
+    // memberIds: ['string'],
+    'messages': [{
+      'id': 'uint',
+      'type': 'string',
+      'userId?': 'string',
+      'text': 'string',
+      'ts': 'uint',
+      'isEdited': 'boolean',
+      'threadId?': 'uint',
+      'replyCount?': 'uint',
+      'replyUsersCount?': 'uint',
+      'replyUserIds?': ['string'],
+      'replyMessageIds?': ['uint'],
+      'latestReply?': 'uint',
+      'reactions?': [{
+        name: 'string',
+        count: 'uint',
+        userIds: ['string'],
+      }],
+      'files?': [{
+        id: 'string',
+        name: 'string',
+        mimeType: 'string',
+        src: 'string',
+      }],
+      'attachments?': [{
+        'serviceName?': 'string',
+        'serviceIcon?': 'string',
+        'title?': 'string',
+        'titleUrl?': 'string',
+        'text?': 'string',
+        'thumbUrl?': 'string',
+        'imageUrl?': 'string',
+        'quoteId?': 'uint',
+        'channelId?': 'string',
+      }],
+    }],
+  }],
+});
