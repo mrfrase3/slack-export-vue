@@ -23,9 +23,8 @@ const message = computed(() => ({
     </template>
     <message
       :message="message"
-      :users="store.users"
-      :channels="store.channels"
       :above-message="null"
+      :channel-id="store.channels?.[0]?.id || ''"
       hide-date-rule
     />
     <textarea
