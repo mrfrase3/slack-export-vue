@@ -94,6 +94,13 @@ onMounted(() => {
         accept=".zip"
         @change="onFileChange"
       >
+      <div class="header">
+        <h1>
+          <img src="/slax.svg" alt="" style="height: 1em; margin-right: 8px">
+          Slax Pro
+        </h1>
+        <p>A <i>Free &amp; Professional</i> viewer for slack-like export content.</p>
+      </div>
       <div
         v-show="!file"
         :class="`drop-area ${colorClass}`"
@@ -180,6 +187,21 @@ onMounted(() => {
 
 .loading-splash > strong {
   margin-top: 8px;
+}
+
+.loading-splash .header {
+  background: #ffffff20;
+  padding: 16px;
+  border-radius: 16px;
+  width: fit-content;
+  margin-bottom: 32px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.loading-splash .header h1,
+.loading-splash .header p {
+  margin: 4px 0;
 }
 
 .moving-gradient {

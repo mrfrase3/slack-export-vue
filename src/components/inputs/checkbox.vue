@@ -62,7 +62,7 @@ const toggle = () => {
 
 .checkbox-hint {
   font-size: 12px;
-  color: #ddd;
+  /* color: #ddd; */
 }
 
 </style>
