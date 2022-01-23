@@ -21,6 +21,7 @@ jobs:
           yarn install --frozen-lockfile
           yarn build
           echo 'slax.pro' > dist/CNAME
+          cp dist/index.html dist/404.html
       - name: Deploy
         uses: s0/git-publish-subdir-action@develop
         env:
