@@ -3,5 +3,5 @@ node_modules
 dist
 dist-ssr
 *.local
-public/export.zip
+public/*.zip
 public/*.bin

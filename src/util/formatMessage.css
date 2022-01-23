@@ -1,0 +1,71 @@
+
+
+.formatter-link,
+.formatter-mention {
+  cursor: pointer;
+  color: rgb(18, 100, 163);
+  text-decoration: none;
+}
+
+.formatter-mention {
+  background-color: rgba(29, 155, 209, 0.1);
+  padding: 1px 2px;
+  padding-top: 0;
+  border-radius: 3px;
+}
+
+.formatter-link:hover,
+.formatter-mention:hover {
+  color: rgb(11, 76, 140);
+  text-decoration: underline;
+}
+
+.formatter-ul {
+  padding: 0;
+  margin: 0;
+}
+
+.formatter-ul li {
+  list-style: none;
+  margin-left: 28px;
+}
+.formatter-ul[data-indent="1"] li {
+  margin-left: calc(28px * 2);
+}
+.formatter-ul[data-indent="2"] li {
+  margin-left: calc(28px * 3);
+}
+.formatter-ul[data-indent="3"] li {
+  margin-left: calc(28px * 4);
+}
+.formatter-ul[data-indent="4"] li {
+  margin-left: calc(28px * 5);
+}
+.formatter-ul[data-indent="5"] li {
+  margin-left: calc(28px * 6);
+}
+.formatter-ul[data-indent="6"] li {
+  margin-left: calc(28px * 7);
+}
+
+.formatter-ul li:before {
+  content: "•";
+  margin-right: 6px;
+  margin-left: -28px;
+  font-size: 20px;
+  vertical-align: bottom;
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1;
+  width: 22px;
+  text-align: center;
+}
+
+.formatter-ul[data-indent="1"] li:before,
+.formatter-ul[data-indent="4"] li:before {
+  content: "◦";
+}
+.formatter-ul[data-indent="2"] li:before,
+.formatter-ul[data-indent="5"] li:before {
+  content: "▪︎";
+}

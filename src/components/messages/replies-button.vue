@@ -1,28 +1,36 @@
 <script setup lang="ts">
 
 const store = useStore();
+const route = useRoute();
 const props = defineProps<{
   message: Message
 }>();
 
 const replyUserImgs = computed(() => {
+  let maxUsers = 5;
+  if (store.deviceType === 'sm') maxUsers = 3;
+  if (store.deviceType === 'xs') maxUsers = 1;
   return props.message.replyUserIds?.map((userId: string) => {
     const user = store.users[userId];
     return {
       src: user.image24 || user.image72,
       alt: user.name,
     };
-  }).splice(0, 5) || [];
+  }).splice(0, maxUsers) || [];
 });
 
 const latest = computed(() => {
   return dayjs(props.message.latestReply);
 });
 
+const threadRef = computed(() => {
+  return `${route.params.channelId}-${props.message.id}`;
+});
+
 </script>
 
 <template>
-  <a class="replies-btn">
+  <router-link :to="{ query: { threadRef } }" class="replies-btn">
     <div class="user-avatars">
       <img v-for="(userImg, i) in replyUserImgs" :key="i" v-bind="userImg">
     </div>
@@ -43,7 +51,7 @@ const latest = computed(() => {
     <div class="chevron">
       <icon icon="mdi:chevron-right" />
     </div>
-  </a>
+  </router-link>
 </template>
 
 <style scoped>
@@ -59,8 +67,11 @@ const latest = computed(() => {
   border: 1px solid transparent;
   cursor: pointer;
   margin-top: 4px;
-  max-width: 600px;
+  max-width: min(600px, calc(100vw - 100px));
   font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-avatars img {

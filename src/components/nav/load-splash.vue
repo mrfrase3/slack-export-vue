@@ -245,40 +245,9 @@ onMounted(() => {
   margin-right: 4px;
 }
 
-.btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 1.2em;
-  background-color: #481449;
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.btn:hover {
-  background-color: #481449aa;
-}
-
-.btn:deep(.icon) {
-  margin-right: 4px;
-}
-
-.btn.btn-text {
-  background-color: transparent;
-  /* color: #481449; */
-}
-
 .actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
-}
-
-.spacer {
-  flex: 1;
 }
 </style>

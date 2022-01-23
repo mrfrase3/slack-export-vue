@@ -2,11 +2,17 @@
 import Popper from 'vue3-popper';
 
 const store = useStore();
+const firstClick = ref(false);
 
 const id = 'mrfrase3';
 const description = 'Support me on Buy me a coffee!';
 const bcmLink = computed(() => {
   return `https://www.buymeacoffee.com/widget/page/${id}?description=${encodeURIComponent(description)}&color=${encodeURIComponent('#5F7FFF')}`;
+});
+
+watchEffect(() => {
+  if (!store.coffeeMenu) return;
+  firstClick.value = true;
 });
 
 </script>
@@ -24,6 +30,7 @@ const bcmLink = computed(() => {
     </div>
     <template #content>
       <iframe
+        v-if="firstClick || store.coffeeMenu"
         :src="bcmLink"
         title="Buy me a coffee"
         class="bmc-iframe"

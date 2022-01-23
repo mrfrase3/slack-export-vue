@@ -2,6 +2,7 @@
 
 const props = defineProps<{
   file: FileObject
+  maxWidth?: number
 }>();
 
 const type = computed(() => {
@@ -12,13 +13,27 @@ const src = computed(() => {
   return props.file.src;
 });
 
+const style = computed(() => {
+  if (!props.file.width || !props.file.height || !props.maxWidth) return {};
+  const maxWidth = props.maxWidth;
+  const maxHeight = 360;
+  const fileWidth = props.file.width;
+  const fileHeight = props.file.height;
+  const ratio = fileWidth / fileHeight;
+  const height = Math.min(ratio > 1 ? maxWidth / ratio : maxHeight, fileHeight);
+  return {
+    // width: `${props.file.width}px`,
+    height: `${height}px`,
+  };
+});
+
 </script>
 
 <template>
   <div class="file-preview">
-    <video v-if="type === 'video'" :src="src" controls />
+    <video v-if="type === 'video'" :src="src" controls :style="style" />
     <a v-else :href="src" target="_blank">
-      <img v-if="type === 'image'" :src="src" :alt="props.file.name">
+      <img v-if="type === 'image'" :src="src" :alt="props.file.name" :style="style">
       <div v-else class="unknown-preview">
         <icon icon="mdi:file-download-outline" style="font-size: 48px;" />
         <div class="file-name">{{ props.file.name }}</div>
@@ -30,8 +45,10 @@ const src = computed(() => {
 <style scoped>
 
 .file-preview {
-  display: inline-block;
-  height: 360px;
+  /* display: inline-block; */
+  max-height: 360px;
+  margin-right: 4px;
+  margin-bottom: 4px;
 }
 
 .file-preview a {
@@ -49,6 +66,7 @@ const src = computed(() => {
   height: 100%;
   max-width: 100%;
   overflow: hidden;
+  border: 1px solid #ddd;
   border-radius: 8px;
 }
 
@@ -56,16 +74,18 @@ const src = computed(() => {
   max-height: 100%;
   max-width: 100%;
   overflow: hidden;
+  border: 1px solid #ddd;
   border-radius: 8px;
 }
 
 .unknown-preview {
-  height: 100%;
+  height: 200px;
   width: 200px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #eee;
+  border: 1px solid #ddd;
   border-radius: 8px;
   flex-direction: column;
 }

@@ -12,3 +12,11 @@ declare module 'vue3-popper' {
   const file: Component;
   export default file;
 }
+
+declare module 'v3-infinite-loading' {
+  import type { Component } from 'vue';
+  const file: Component;
+  export default file;
+}
+
+declare module 'js-binary';

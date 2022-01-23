@@ -8,6 +8,7 @@ const props = defineProps<{
   message: Message
   aboveMessage: Message | null
   hideDateRule?: boolean
+  hideReplies?: boolean
 }>();
 
 const timestamp = computed(() => {
@@ -15,8 +16,8 @@ const timestamp = computed(() => {
 });
 
 const isNewDate = computed(() => {
-  const cDate = dayjs(props.message.ts).format('YYYY-MM-DD');
-  const aDate = timestamp.value.format('YYYY-MM-DD');
+  const cDate = timestamp.value.format('YYYY-MM-DD');
+  const aDate = dayjs(props.aboveMessage?.ts).format('YYYY-MM-DD');
   return !props.aboveMessage || cDate !== aDate;
 });
 
@@ -25,6 +26,14 @@ const isContinued = computed(() => {
 });
 
 const user = computed(() => {
+  if (props.message.type.startsWith('bot')) {
+    return {
+      name: 'Bot',
+      image: '/robot.png',
+      image24: '/robot.png',
+      image72: '/robot.png',
+    } as unknown as User;
+  }
   return store.users[props.message.userId];
 });
 
@@ -32,10 +41,16 @@ const justEmoji = computed(() => {
   return props.message.text.match(/^(:[+a-z0-9_-]+:)+$/i);
 });
 
+const nameDate = computed(() => {
+  return props.hideDateRule && isNewDate.value
+    ? timestamp.value?.format('Do MMM, YYYY [at] h:mm a')
+    : timestamp.value?.format('h:mm a').toUpperCase();
+});
+
 </script>
 
 <template>
-  <div :id="`message-${message.id}`">
+  <div v-if="message?.id" :id="`message-${message.id}`">
     <div v-if="isNewDate && !hideDateRule" class="message-list-date-wrap">
       <hr>
       <div class="message-list-date">
@@ -55,12 +70,12 @@ const justEmoji = computed(() => {
             {{ user?.name }}
           </span>
           <span class="message-timestamp">
-            {{ timestamp?.format('h:mm a').toUpperCase() }}
+            {{ nameDate }}
           </span>
         </div>
         <div
           v-if="message.text"
-          :class="{ 'message-content': true, 'just-emoji': justEmoji }"
+          :class="{ 'message-content': true, 'just-emoji': justEmoji, 'non-message': message.type !== 'message' }"
           v-html="formatMessage(message.text, store.users, store.channels)"
         />
         <file-gallery v-if="message.files?.length" :files="message.files" />
@@ -72,7 +87,7 @@ const justEmoji = computed(() => {
           />
         </div>
         <replies-button
-          v-if="message.replyCount"
+          v-if="message.replyCount && !props.hideReplies"
           :message="message"
         />
       </div>
@@ -130,6 +145,7 @@ const justEmoji = computed(() => {
   padding-left: 8px;
   overflow-wrap: anywhere;
   flex: 1;
+  max-width: calc(100% - 44px);
 }
 
 .message-author {
@@ -161,74 +177,12 @@ const justEmoji = computed(() => {
   margin-top: 4px;
 }
 
-.message-content:deep(.message-link),
-.message-content:deep(.mention) {
-  cursor: pointer;
-  color: rgb(18, 100, 163);
-  text-decoration: none;
+.message-content {
+  white-space: pre-wrap;
 }
 
-.message-content:deep(.mention) {
-  background-color: rgba(29, 155, 209, 0.1);
-  padding: 1px 2px;
-  padding-top: 0;
-  border-radius: 3px;
-}
-
-.message-content:deep(.message-link:hover),
-.message-content:deep(.mention:hover) {
-  color: rgb(11, 76, 140);
-  text-decoration: underline;
-}
-
-.message-content:deep(ul) {
-  padding: 0;
-  margin: 0;
-}
-
-.message-content:deep(ul li) {
-  list-style: none;
-  margin-left: 28px;
-}
-.message-content:deep(ul[data-indent="1"] li) {
-  margin-left: calc(28px * 2);
-}
-.message-content:deep(ul[data-indent="2"] li) {
-  margin-left: calc(28px * 3);
-}
-.message-content:deep(ul[data-indent="3"] li) {
-  margin-left: calc(28px * 4);
-}
-.message-content:deep(ul[data-indent="4"] li) {
-  margin-left: calc(28px * 5);
-}
-.message-content:deep(ul[data-indent="5"] li) {
-  margin-left: calc(28px * 6);
-}
-.message-content:deep(ul[data-indent="6"] li) {
-  margin-left: calc(28px * 7);
-}
-
-.message-content:deep(ul li:before) {
-  content: "•";
-  margin-right: 6px;
-  margin-left: -28px;
-  font-size: 20px;
-  vertical-align: bottom;
-  display: inline-block;
-  white-space: nowrap;
-  line-height: 1;
-  width: 22px;
-  text-align: center;
-}
-
-.message-content:deep(ul[data-indent="1"] li:before),
-.message-content:deep(ul[data-indent="4"] li:before) {
-  content: "◦";
-}
-.message-content:deep(ul[data-indent="2"] li:before),
-.message-content:deep(ul[data-indent="5"] li:before) {
-  content: "▪︎";
+.message-content.non-message {
+  color: #777;
 }
 
 .message-content:deep(.emoji) {

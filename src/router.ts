@@ -9,7 +9,7 @@ export default createRouter({
       component: () => import('./views/Home.vue'),
     },
     {
-      path: '/channel/:channelName',
+      path: '/channel/:channelId',
       name: 'channel',
       component: () => import('./views/Channel.vue'),
     },

@@ -5,6 +5,7 @@
 declare module 'vue' {
   export interface GlobalComponents {
     ChannelList: typeof import('./src/components/nav/channel-list.vue')['default']
+    ChatHeader: typeof import('./src/components/nav/chat-header.vue')['default']
     Checkbox: typeof import('./src/components/inputs/checkbox.vue')['default']
     Coffee: typeof import('./src/components/nav/coffee.vue')['default']
     FileGallery: typeof import('./src/components/files/file-gallery.vue')['default']
@@ -18,6 +19,7 @@ declare module 'vue' {
     ReactChip: typeof import('./src/components/messages/react-chip.vue')['default']
     RepliesButton: typeof import('./src/components/messages/replies-button.vue')['default']
     SidebarFooter: typeof import('./src/components/nav/sidebar-footer.vue')['default']
+    ThreadSidebar: typeof import('./src/components/nav/thread-sidebar.vue')['default']
   }
 }
 

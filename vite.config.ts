@@ -16,7 +16,7 @@ export default defineConfig({
         'vue',
         'vue-router',
         {
-          'dayjs': [['*', 'dayjs']],
+          '@/util/dayjs': [['default', 'dayjs']],
           '@/util/emoji': [['default', 'emoji']],
           '@/store/index': ['useStore'],
         },

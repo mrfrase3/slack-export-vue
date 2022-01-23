@@ -19,6 +19,8 @@ declare global {
     name: string
     mimeType: string
     src: string
+    width?: number
+    height?: number
   }
 
   interface Attachment {

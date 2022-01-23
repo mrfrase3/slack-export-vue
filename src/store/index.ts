@@ -15,6 +15,13 @@ const extractJson = async(dir: any, path: string) => {
 
 const ts = (timeStamp: number | string) => Math.floor(Number(timeStamp) * 1000);
 
+const getDeviceType = (width: number) => {
+  if (width < 600) return 'xs';
+  if (width < 960) return 'sm';
+  if (width < 1264) return 'md';
+  return 'lg';
+};
+
 export const useStore = defineStore('store', {
   state: () => ({
     dataLoaded: false,
@@ -31,6 +38,9 @@ export const useStore = defineStore('store', {
       removeLinkPreviews: false,
     },
     coffeeMenu: false,
+    leftSidebar: false,
+    deviceWidth: window.innerWidth,
+    deviceType: getDeviceType(window.innerWidth),
   }),
 
   actions: {
@@ -38,16 +48,18 @@ export const useStore = defineStore('store', {
       try {
         if (!this.binaryData) {
           this.status = 'Downloading...';
-          const res = await fetch('/export.bin');
+          const res = await fetch('/export.bin.zip');
           if (!res.ok) {
             this.exportNeeded = true;
             this.status = 'Waiting for export';
             return;
           }
-          this.binaryData = Buffer.from(await res.arrayBuffer());
+          const archive = await Archive.open(new File([await res.arrayBuffer()], 'export.bin.zip'));
+          const dir = await archive.extractFiles();
+          const binFile = dir['export.bin'] as File;
+          this.binaryData = Buffer.from(await binFile.arrayBuffer());
           this.binarySource = 'download';
-        }
-        else {
+        } else {
           this.binarySource = 'upload';
         }
         this.status = 'Extracting...';
@@ -56,8 +68,7 @@ export const useStore = defineStore('store', {
         users.forEach((user: User) => { this.users[user.id] = user; });
         this.status = 'Done';
         this.dataLoaded = true;
-      }
-      catch (e: any) {
+      } catch (e: any) {
         this.status = `Error: ${e.message}`;
         console.error(e);
       }
@@ -98,6 +109,8 @@ export const useStore = defineStore('store', {
           name: f.name || f.filetype ? `${f.id}.${f.filetype}` : 'Untitled',
           mimeType: f.mimetype,
           src: f.url_private,
+          width: f.original_w,
+          height: f.original_h,
         })).filter((f: FileObject) => f.src && f.mimeType && f.id),
         attachments: message.attachments?.map((a: any) => ({
           serviceName: a.service_name,
@@ -155,24 +168,40 @@ export const useStore = defineStore('store', {
         }, Promise.resolve());
         this.status = 'Making Binary...';
         this.binaryData = await binary.encode({ channels, users });
-      }
-      catch (e: any) {
+      } catch (e: any) {
         this.status = `Error: ${e.message}`;
         console.error(e);
       }
     },
 
-    downloadBinary() {
+    async downloadBinary() {
       if (!this.binaryData) {
         return;
       }
+      const { default: JSZip } = await import('jszip');
+      const zip = new JSZip();
       const blob = new Blob([this.binaryData], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
+      zip.file('export.bin', blob);
+      const zipBlob = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 9 },
+      });
+      const url = URL.createObjectURL(zipBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'export.bin';
+      a.download = 'export.bin.zip';
       a.click();
       URL.revokeObjectURL(url);
+    },
+
+    toggleSidebar() {
+      this.leftSidebar = !this.leftSidebar;
+    },
+
+    onWidthChange() {
+      this.deviceWidth = window.innerWidth;
+      this.deviceType = getDeviceType(this.deviceWidth);
     },
   },
 });

@@ -9,5 +9,7 @@ module.exports = {
     '@typescript-eslint/semi': ['error', 'always'],
     'no-console': 'warn',
     'curly': ['error', 'multi-line'],
+    'brace-style': 'off',
+    '@typescript-eslint/brace-style': ['error', '1tbs', { 'allowSingleLine': true }],
   }
 }

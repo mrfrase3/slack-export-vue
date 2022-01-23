@@ -31,7 +31,7 @@ const parseText = (text: string, users: any, channels: any[]) => {
         const isLastLine = i === lines.length - 1;
         if (aboveLine && count(aboveLine, ulSplitRegExp) !== count(line, ulSplitRegExp)) html += '</ul>';
         if (isFirstLine || count(aboveLine, ulSplitRegExp) !== count(line, ulSplitRegExp)) {
-          html += `<ul data-indent="${Math.round(count(line, ulSplitRegExp) / 4)}">`;
+          html += `<ul class="formatter-ul" data-indent="${Math.round(count(line, ulSplitRegExp) / 4)}">`;
         }
         html += `<li>${line.split(ulSplitRegExp)[2].trim()}</li>`;
         if (isLastLine) {
@@ -43,17 +43,17 @@ const parseText = (text: string, users: any, channels: any[]) => {
     .replace(/<@(U[\w]+)>/g, (match: string, userId: string) => {
       const user = users[userId];
       const name = user.profile?.display_name || user.profile?.real_name || user.name;
-      return escapeText(user ? `<span class="mention">@${name}</span>` : match);
+      return escapeText(user ? `<span class="formatter-mention">@${name}</span>` : match);
     })
     .replace(/<!([\w\^]+)>/g, (match: string, mention: string) => {
-      return escapeText(`<span class="mention">@${mention}</span>`);
+      return escapeText(`<span class="formatter-mention">@${mention}</span>`);
     })
-    .replace(/<#(C[\w\^]+)>/g, (match: string, channelId: string) => {
-      const channel = channels.find((c: any) => c.id === channelId);
-      return escapeText(channel ? `<a class="mention" href="#${channel.name}">#${channel.name}</a>` : match);
+    .replace(/<#(C[\w\^\|]+)>/g, (match: string, channelId: string) => {
+      const channel = channels.find((c: any) => channelId.startsWith(c.id));
+      return escapeText(channel ? `<a class="formatter-mention" href="#${channel.name}">#${channel.name}</a>` : match);
     })
-    .replace(/<(https?:\/\/[^<|>]+)\|?([^<>]+)?>/g, (match: string, href: string, alt: string) => {
-      return escapeText(`<a class="message-link" href="${href}" target="_blank">${alt || href}</a>`);
+    .replace(/<((https?:\/\/|mailto:|tel:)[^<|>]+)\|?([^<>]+)?>/g, (match: string, href: string, proto: string, alt: string) => {
+      return escapeText(`<a class="formatter-link" href="${href}" target="_blank">${alt || href}</a>`);
     })
     .replace(/(:[^: ]+:)/gm, (match: string) => {
       const emojiHtml = emoji.replace_colons(match);
@@ -71,12 +71,11 @@ export default (text: string, users: any, channels: any[]) => {
       return text.split('`').map((part: string, j: number) => {
         if (j % 2 === 0) {
           return parseText(part, users, channels);
-        }
-        else {
-          return `<code>${part}</code>`;
+        } else {
+          return `<code class="formatter-code inline">${part}</code>`;
         }
       }).join('');
     }
-    return `<pre class="code"><code>${block}</code></pre>`;
+    return `<pre class="formatter-code block"><code>${block}</code></pre>`;
   }).join('');
 };

@@ -5,6 +5,7 @@ const props = defineProps<{
 }>();
 
 const isHidden = ref(false);
+const wrapper = ref(null as null | HTMLDivElement);
 
 const displayName = computed(() => {
   if (props.files.length === 1) return props.files[0].name;
@@ -15,7 +16,7 @@ const displayName = computed(() => {
 </script>
 
 <template>
-  <div class="file-list">
+  <div ref="wrapper" class="file-list">
     <div class="file-list-header">
       <span class="file-list-header-title">
         {{ displayName }}
@@ -24,7 +25,13 @@ const displayName = computed(() => {
         <icon :icon="`mdi:chevron-${isHidden ? 'right' : 'down'}-circle`" @click="isHidden = !isHidden" />
       </span>
     </div>
-    <file-preview v-for="file in files" v-show="!isHidden" :key="file.id" :file="file" />
+    <file-preview
+      v-for="file in wrapper ? files : []"
+      v-show="!isHidden"
+      :key="file.id"
+      :file="file"
+      :max-width="wrapper?.offsetWidth"
+    />
   </div>
 </template>
 

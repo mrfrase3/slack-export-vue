@@ -36,10 +36,12 @@ export default new Type({
         userIds: ['string'],
       }],
       'files?': [{
-        id: 'string',
-        name: 'string',
-        mimeType: 'string',
-        src: 'string',
+        'id': 'string',
+        'name': 'string',
+        'mimeType': 'string',
+        'src': 'string',
+        'width?': 'uint',
+        'height?': 'uint',
       }],
       'attachments?': [{
         'serviceName?': 'string',

@@ -6,8 +6,9 @@ import { createPinia } from 'pinia';
 import router from './router';
 import App from './App.vue';
 import './util/dayjs';
-import 'emoji-js/lib/emoji.css';
 import './global.css';
+import './util/formatMessage.css';
+import 'v3-infinite-loading/lib/style.css';
 
 window.Buffer = Buffer;
 

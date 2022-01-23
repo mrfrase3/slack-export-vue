@@ -1,0 +1,62 @@
+diff --git a/node_modules/js-binary/lib/Field.js b/node_modules/js-binary/lib/Field.js
+index b1dec8f..4d2ef5c 100644
+--- a/node_modules/js-binary/lib/Field.js
++++ b/node_modules/js-binary/lib/Field.js
+@@ -1,14 +1,12 @@
+ 'use strict'
+ 
+-var Type
+-
+ /**
+  * Parse and represent an object field. See example in Type.js
+  * @class
+  * @param {string} name
+  * @param {string|Object|Array<string>|Array<Object>} type
+  */
+-function Field(name, type) {
++function Field(name, type, Type) {
+ 	/** @member {boolean} */
+ 	this.optional = false
+ 
+@@ -35,5 +33,3 @@ function Field(name, type) {
+ }
+ 
+ module.exports = Field
+-
+-Type = require('./Type')
+\ No newline at end of file
+diff --git a/node_modules/js-binary/lib/Type.js b/node_modules/js-binary/lib/Type.js
+index 4c3ad77..746be7e 100644
+--- a/node_modules/js-binary/lib/Type.js
++++ b/node_modules/js-binary/lib/Type.js
+@@ -1,7 +1,9 @@
+ 'use strict'
+ 
+-var types = require('./types'),
+-	Data, ReadState, Field
++var types = require('./types');
++var Data = require('./Data');
++var ReadState = require('./ReadState');
++var Field = require('./Field');
+ 
+ /**
+  * Create a type, given the format. The format can be either:
+@@ -48,17 +50,13 @@ function Type(type) {
+ 
+ 		this.type = Type.TYPE.OBJECT
+ 		this.fields = Object.keys(type).map(function (name) {
+-			return new Field(name, type[name])
++			return new Field(name, type[name], Type)
+ 		})
+ 	}
+ }
+ 
+ module.exports = Type
+ 
+-Data = require('./Data')
+-ReadState = require('./ReadState')
+-Field = require('./Field')
+-
+ /**
+  * All possible types
+  * @enum {string}

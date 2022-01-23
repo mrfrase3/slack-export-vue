@@ -4,7 +4,7 @@ const store = useStore();
 const route = useRoute();
 
 const isActive = (channel: Channel) => {
-  return route.params.channelName === channel.name;
+  return route.params.channelId === channel.id;
 };
 
 </script>
@@ -15,9 +15,9 @@ const isActive = (channel: Channel) => {
       Channels
     </div>
     <ul>
-      <li v-for="channel in store.channels" :key="channel.name">
+      <li v-for="channel in store.channels" :key="channel.id">
         <router-link
-          :to="`/channel/${channel.name}`"
+          :to="{ params: { channelId: channel.id }, query: { ...route.query }, name: 'channel' }"
           :class="{ link: true, active: isActive(channel) }"
         >
           <span style="padding-right: 8px;">#</span>
