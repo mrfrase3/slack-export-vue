@@ -65,7 +65,9 @@ export const useStore = defineStore('store', {
         this.status = 'Extracting...';
         const { channels, users } = await binary.decode(this.binaryData);
         this.channels = channels.map((c: Channel) => ({ ...c, rootMessages: c.messages?.filter((m: Message) => !m.threadId) }));
-        users.forEach((user: User) => { this.users[user.id] = user; });
+        const usersMap = {} as Record<string, User>;
+        users.forEach((user: User) => { usersMap[user.id] = user; });
+        this.users = usersMap;
         this.status = 'Done';
         this.dataLoaded = true;
       } catch (e: any) {
@@ -171,6 +173,22 @@ export const useStore = defineStore('store', {
       } catch (e: any) {
         this.status = `Error: ${e.message}`;
         console.error(e);
+      }
+    },
+
+    async checkIfBinZip(file: File) {
+      try {
+        this.status = 'Checking Files...';
+        const archive = await Archive.open(file);
+        const dir = await archive.getFilesObject() as any;
+        if (!dir['export.bin']) return false;
+        const binFile = await dir['export.bin']?.extract() as File;
+        this.binaryData = Buffer.from(await binFile.arrayBuffer());
+        this.exportNeeded = false;
+        this.loadBinary();
+        return true;
+      } catch (e: any) {
+        return false;
       }
     },
 

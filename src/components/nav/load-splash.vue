@@ -5,6 +5,7 @@ const file = ref(null as null | File);
 const isDragging = ref(false);
 const isValidDrag = ref(false);
 const showInvalid = ref(false);
+const isChecking = ref(false);
 
 const zipIcon = computed(() => {
   if (showInvalid.value) return 'mdi:alert-outline';
@@ -43,18 +44,26 @@ const resetDrag = () => {
   isValidDrag.value = false;
 };
 
-const onFileChange = (e: any) => {
+const onFileChange = async(e: any) => {
   e.preventDefault();
   const target = e.dataTransfer ?? e.target;
   file.value = fsArr(target.files).find((f: File) => f.type === 'application/zip') ?? null;
   resetDrag();
   showInvalid.value = !file.value;
+  if (file.value) {
+    isChecking.value = true;
+    if (await store.checkIfBinZip(file.value)) {
+      file.value = null;
+    }
+    isChecking.value = false;
+  }
 };
 
 const onExport = async() => {
   if (file.value) {
     await store.loadExport(file.value);
     await store.loadBinary();
+    file.value = null;
   }
 };
 
@@ -66,7 +75,7 @@ onMounted(() => {
 
 <template>
   <div v-show="!store.dataLoaded" class="loading-splash moving-gradient">
-    <div v-show="!store.exportNeeded">
+    <div v-show="!store.exportNeeded || isChecking">
       <img alt="Loading" src="@/assets/loading.svg">
       <br>
       <br>
@@ -76,7 +85,7 @@ onMounted(() => {
         Back
       </button>
     </div>
-    <div v-show="store.exportNeeded">
+    <div v-show="store.exportNeeded && !isChecking">
       <input
         v-show="false"
         :key="file?.name"

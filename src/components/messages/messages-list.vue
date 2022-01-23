@@ -42,6 +42,7 @@ const aboveMessage = (i: number) => {
 
 watch(channel, () => {
   messages.value = [];
+  page.value = 0;
 });
 
 </script>
