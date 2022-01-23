@@ -87,6 +87,7 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange));
 .sidebar .channel-list {
   flex: 1;
   overflow-y: auto;
+  overflow-y: overlay;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -115,6 +116,7 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange));
   right: 0;
   bottom: 0;
   overflow-y: auto;
+  overflow-y: overlay;
   -webkit-overflow-scrolling: touch;
 }
 

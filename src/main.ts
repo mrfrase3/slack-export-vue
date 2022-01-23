@@ -8,7 +8,6 @@ import App from './App.vue';
 import './util/dayjs';
 import './global.css';
 import './util/formatMessage.css';
-import 'v3-infinite-loading/lib/style.css';
 
 window.Buffer = Buffer;
 

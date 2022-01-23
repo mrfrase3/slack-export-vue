@@ -64,4 +64,11 @@ li {
 .link.active {
   background-color: #1164a3;
 }
+
+@media screen and (max-width: 960px) {
+  .link {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
 </style>

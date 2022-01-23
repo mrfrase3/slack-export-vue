@@ -18,7 +18,7 @@ Currently to use it, you need to:
 - [x] Add in vuex?
 - [x] Add a view for a messages reply thread
   - [x] Allow externally linking to a message thread view
-- [ ] Add linking to a message in the channel view (where ever it is in the history)
+- [x] Add linking to a message in the channel view (where ever it is in the history)
 - [ ] Add in search functionality
 - [ ] Add in a view for a user profile
   - [ ] Allow externally linking to a user profile view

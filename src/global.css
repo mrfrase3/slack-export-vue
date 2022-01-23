@@ -61,10 +61,6 @@
   text-decoration: none;
 }
 
-#vue3-infinite-loading {
-  text-align: center;
-}
-
 /* custom scrollbar */
 ::-webkit-scrollbar {
   width: 20px;

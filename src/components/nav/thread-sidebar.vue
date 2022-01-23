@@ -22,8 +22,9 @@ const message = computed(() => {
 
 const replies = computed(() => {
   const messageId = Number(threadRef.value.split('-')[1]);
+  if (!message.value?.replyMessageIds?.length) return [];
   return channel.value?.messages?.filter((m: Message) => m.threadId === messageId
-    || message.value?.replyMessageIds.indexOf(m.id) !== -1) || [];
+    || message.value?.replyMessageIds?.indexOf(m.id) !== -1) || [];
 });
 
 const close = () => {
@@ -53,7 +54,15 @@ watch(routeThreadRef, () => {
     @close="close"
   />
   <div class="thread-list">
-    <Message :message="message" :above-message="null" style="margin: 16px 0;" hide-date-rule hide-replies />
+    <Message
+      :message="message"
+      :above-message="null"
+      :channel-id="channel?.id || ''"
+      style="margin: 16px 0;"
+      id-ref="thread"
+      hide-date-rule
+      hide-replies
+    />
     <hr>
     <div class="replies-count">
       <small>{{ replies.length }} Repl{{ replies.length === 1 ? 'y' : 'ies' }}</small>
@@ -63,6 +72,7 @@ watch(routeThreadRef, () => {
       :key="reply.id"
       :message="reply"
       :above-message="getAboveMessage(i)"
+      :channel-id="channel?.id"
       :class="{ last: i === replies.length - 1 }"
       hide-date-rule
       hide-replies
@@ -80,6 +90,7 @@ hr {
 .thread-list {
   flex: 1;
   overflow-y: auto;
+  overflow-y: overlay;
 }
 
 .last {

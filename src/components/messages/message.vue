@@ -1,15 +1,21 @@
 <script setup lang="ts">
+import Popper from 'vue3-popper';
 import formatMessage from '../../util/formatMessage';
 
-const messages = ref([] as any[]);
 const store = useStore();
+const route = useRoute();
 
 const props = defineProps<{
   message: Message
   aboveMessage: Message | null
+  channelId: string
   hideDateRule?: boolean
   hideReplies?: boolean
+  idRef?: string
 }>();
+
+const messages = ref([] as any[]);
+const copyCopy = ref('Copy Link');
 
 const timestamp = computed(() => {
   return dayjs(props.message?.ts);
@@ -47,17 +53,52 @@ const nameDate = computed(() => {
     : timestamp.value?.format('h:mm a').toUpperCase();
 });
 
+const id = computed(() => {
+  return `${props.idRef || 'message'}-${props.message.id}`;
+});
+
+const isActive = computed(() => {
+  const threadId = `${route.query.threadRef || ''}`.split('-')[1];
+  return id.value === `message-${threadId}`;
+});
+
+// combine logic for showing/hiding each action to show if any are true
+const showActions = computed(() => {
+  return !props.message.threadId;
+});
+
+const copyLink = () => {
+  const link = `${window.location.origin}/channel/${props.channelId}?threadRef=${props.channelId}-${props.message.id}`;
+  navigator.clipboard.writeText(link);
+  copyCopy.value = 'Copied!';
+  setTimeout(() => {
+    copyCopy.value = 'Copy Link';
+  }, 2000);
+};
+
 </script>
 
 <template>
-  <div v-if="message?.id" :id="`message-${message.id}`">
+  <div v-if="message?.id" :id="id">
     <div v-if="isNewDate && !hideDateRule" class="message-list-date-wrap">
       <hr>
       <div class="message-list-date">
         {{ timestamp.format('MMMM Do, YYYY') }}
       </div>
     </div>
-    <div v-if="message" :class="{ message: true, continued: isContinued }">
+    <div v-if="message" :class="{ message: true, continued: isContinued, active: isActive }">
+      <div v-show="showActions" class="message-actions">
+        <Popper v-if="!message.threadId" :show="copyCopy === 'Copied!' || null" placement="top" hover arrow>
+          <button class="copy-link-btn" @click="copyLink">
+            <icon icon="mdi:link-variant" />
+          </button>
+          <template #content>
+            <div :class="{ 'copy-link-pop-text': true, success: copyCopy === 'Copied!' }">
+              {{ copyCopy }}
+            </div>
+          </template>
+        </Popper>
+      </div>
       <div class="message-left">
         <div v-if="!isContinued" class="message-avatar">
           <img :src="user?.image72" alt="">
@@ -121,6 +162,7 @@ const nameDate = computed(() => {
 }
 
 .message {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -128,11 +170,57 @@ const nameDate = computed(() => {
 }
 
 .message.continued {
-  padding-top: 0;
+  padding-top: 4px;
 }
 
 .message:hover {
   background: #f5f5f5;
+}
+
+.message.active {
+  background: rgb(255, 197, 38, 0.2);
+}
+
+.message-actions {
+  position: absolute;
+  top: -16px;
+  right: 32px;
+  display: none;
+  padding: 2px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.message:hover .message-actions {
+  display: block;
+}
+.message.continued .message-actions {
+    top: -32px;
+}
+
+.copy-link-btn {
+  padding: 4px 6px;
+  height: 32px;
+  font-size: 1.4em;
+  background-color: #fff;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+.copy-link-btn:hover {
+  background-color: #eee;
+}
+
+.copy-link-pop-text {
+  white-space: nowrap;
+  width: 70px;
+  text-align: center;
+}
+.copy-link-pop-text.success {
+  color: #4caf50;
 }
 
 .message-left {

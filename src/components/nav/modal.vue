@@ -19,9 +19,11 @@ const useInternal = computed(() => typeof props.modelValue === 'undefined');
 const isOpen = computed(() => useInternal.value ? dialog.value : props.modelValue);
 
 const toggleOpen = (val = true) => {
-  if (useInternal.value) { dialog.value = val; }
-
-  else { emit('update:modelValue', val); }
+  if (useInternal.value) {
+    dialog.value = val;
+  } else {
+    emit('update:modelValue', val);
+  }
 };
 
 watch(isOpen, (val) => {
