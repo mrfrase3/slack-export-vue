@@ -8,13 +8,16 @@
   --popper-theme-border-radius:	8px;
   --popper-theme-padding:	8px;
   /* --popper-theme-box-shadow:	0 6px 30px -6px rgba(0, 0, 0, 0.25); */
+
+  --color-primary-rgb: 72, 20, 72; /* not a trademarked color :) */
+  --color-primary: rgb(var(--color-primary-rgb));
 }
 
 .btn {
   padding: 8px 16px;
   border-radius: 4px;
   font-size: 1.2em;
-  background-color: #481449;
+  background-color: var(--color-primary);
   color: white;
   border: none;
   cursor: pointer;
@@ -25,7 +28,7 @@
 }
 
 .btn:hover {
-  background-color: #481449aa;
+  background-color: rgba(var(--color-primary-rgb), 0.6);
 }
 
 .btn:not(.btn-icon) .icon {

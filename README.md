@@ -35,7 +35,7 @@ Currently to use it, you need to:
   - [ ] Fix code blocks
   - [ ] Support Attachments (link previews and quoting earlier messages)
 - [ ] Add docker config for pre-processing/deploying
-- [ ] Add a logo/favicon
+- [x] Add a logo/favicon
 
 ---
 

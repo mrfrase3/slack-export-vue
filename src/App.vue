@@ -29,7 +29,10 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange));
   <load-splash />
   <div :class="{ sidebar: true, closed: !store.leftSidebar }">
     <router-link class="no-link" :to="{ name: 'home', params: {}, query: { ...route.query } }">
-      <h1>#️⃣ Slack Export Vue</h1>
+      <h1>
+        <img src="/slax.svg" alt="" style="height: 1em; margin-right: 8px">
+        Slax Pro
+      </h1>
     </router-link>
     <channel-list />
     <!-- <message-format-modal /> -->
@@ -63,7 +66,7 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange));
   left: 0;
   bottom: 0;
   width: 256px;
-  background: #481449;
+  background: var(--color-primary);
   color: #fff;
   font-weight: 500;
   z-index: 2;

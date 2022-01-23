@@ -193,8 +193,8 @@ onMounted(() => {
 }
 
 .drop-area {
-  background: #48144933;
-  border: 1px dashed #481449;
+  background: rgba(var(--color-primary-rgb), 0.15);
+  border: 1px dashed var(--color-primary);
   border-radius: 12px;
   padding: 16px;
   width: 80vw;
@@ -208,8 +208,8 @@ onMounted(() => {
 }
 
 .drop-area:hover {
-  background: #48144955;
-  border: 1px solid #481449;
+  background: rgba(var(--color-primary-rgb), 0.3);
+  border: 1px solid var(--color-primary);
 }
 
 .drop-area.success {
