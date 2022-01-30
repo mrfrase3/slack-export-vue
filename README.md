@@ -19,8 +19,13 @@ Currently to use it, you need to:
 - [x] Add a view for a messages reply thread
   - [x] Allow externally linking to a message thread view
 - [x] Add linking to a message in the channel view (where ever it is in the history)
-- [ ] Add in search functionality
-- [ ] Add in a view for a user profile
+- [x] Add in search functionality
+  - [x] Tag search (search by mentions/from/in)
+  - [x] Search by message text
+  - [x] Link to message in channel view
+  - [ ] (optional) Add search history/suggestions
+  - [ ] (optional) Add gui for tags on search page
+- [ ] (optional) Add in a view for a user profile
   - [ ] Allow externally linking to a user profile view
 - [x] Switch to pre-processing the export and save it as a [binary file](https://github.com/sitegui/js-binary)
   - [x] Unpack binary file instead, regress data structure
@@ -31,12 +36,13 @@ Currently to use it, you need to:
 - [x] Setup a Linter :/
 - [ ] Finish message rendering
   - [ ] Support ordered lists
-  - [ ] Support Blockquotesgit 
+  - [ ] Support Blockquotes
   - [ ] Fix code blocks
   - [ ] Support Attachments (link previews and quoting earlier messages)
 - [ ] Add docker config for pre-processing/deploying
 - [x] Add a logo/favicon
 
+Items marked with (optional) are not likely to be implemented without external interest.
 ---
 
 # Vue 3 + Typescript + Vite

@@ -16,8 +16,9 @@ const channel = computed(() => {
 });
 
 const message = computed(() => {
-  const messageId = Number(threadRef.value.split('-')[1]);
-  return channel.value?.rootMessages?.find((m: Message) => m.id === messageId);
+  const message = store.messagesById[threadRef.value];
+  if (!message?.threadId) return message;
+  return store.messagesById[`${channel.value.id}-${message.threadId}`];
 });
 
 const replies = computed(() => {

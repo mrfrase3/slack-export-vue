@@ -11,6 +11,8 @@
 
   --color-primary-rgb: 72, 20, 72; /* not a trademarked color :) */
   --color-primary: rgb(var(--color-primary-rgb));
+
+  --navbar-height: 38px;
 }
 
 .btn {
@@ -50,6 +52,15 @@
 
 .btn.btn-icon:hover {
   background-color: #00000011;
+}
+
+.btn.disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.btn.disabled:hover {
+  background-color: transparent;
 }
 
 .spacer {

@@ -27,6 +27,7 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange));
 
 <template>
   <load-splash />
+  <navbar />
   <div :class="{ sidebar: true, closed: !store.leftSidebar }">
     <router-link class="no-link" :to="{ name: 'home', params: {}, query: { ...route.query } }">
       <h1>
@@ -72,16 +73,21 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange));
   z-index: 2;
   display: flex;
   flex-direction: column;
+  margin-top: var(--navbar-height);
 }
 
 .sidebar h1 {
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
-  padding: 1rem;
-  text-align: center;
   text-decoration: none;
   color: #fff;
+  border-bottom: 1px solid rgba(256,256,256, 0.15);
+  border-top: 1px solid rgba(256,256,256, 0.15);
+  height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar .channel-list {
@@ -103,6 +109,7 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange));
   border-left: 1px solid #ccc;
   background-color: #fff;
   transition: right 0.2s ease-in-out;
+  margin-top: var(--navbar-height);
 }
 
 .thread-sidebar.closed {
@@ -118,6 +125,7 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange));
   overflow-y: auto;
   overflow-y: overlay;
   -webkit-overflow-scrolling: touch;
+  margin-top: var(--navbar-height);
 }
 
 .main.offset-right {

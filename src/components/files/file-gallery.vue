@@ -2,6 +2,7 @@
 
 const props = defineProps<{
   files: FileObject[]
+  maxHeight?: number
 }>();
 
 const isHidden = ref(false);
@@ -31,6 +32,7 @@ const displayName = computed(() => {
       :key="file.id"
       :file="file"
       :max-width="wrapper?.offsetWidth"
+      :max-height="maxHeight"
     />
   </div>
 </template>

@@ -11,7 +11,10 @@ const props = defineProps<{
   channelId: string
   hideDateRule?: boolean
   hideReplies?: boolean
+  smallReplies?: boolean
+  nameDateFormat?: string
   idRef?: string
+  fileMaxHeight?: number
 }>();
 
 const messages = ref([] as any[]);
@@ -49,7 +52,7 @@ const justEmoji = computed(() => {
 
 const nameDate = computed(() => {
   return props.hideDateRule && isNewDate.value
-    ? timestamp.value?.format('Do MMM, YYYY [at] h:mm a')
+    ? timestamp.value?.format(props.nameDateFormat || 'Do MMM, YYYY [at] h:mm a')
     : timestamp.value?.format('h:mm a').toUpperCase();
 });
 
@@ -57,9 +60,16 @@ const id = computed(() => {
   return `${props.idRef || 'message'}-${props.message.id}`;
 });
 
+const threadRefMainId = computed(() => {
+  const threadRef = route.query.threadRef || '';
+  const message = store.messagesById[threadRef];
+  if (!message?.threadId) return message?.id;
+  return store.messagesById[`${props.channelId}-${message.threadId}`]?.id;
+});
+
 const isActive = computed(() => {
   const threadId = `${route.query.threadRef || ''}`.split('-')[1];
-  return id.value === `message-${threadId}`;
+  return id.value === `message-${threadId}` || id.value === `message-${threadRefMainId.value}`;
 });
 
 // combine logic for showing/hiding each action to show if any are true
@@ -119,16 +129,27 @@ const copyLink = () => {
           :class="{ 'message-content': true, 'just-emoji': justEmoji, 'non-message': message.type !== 'message' }"
           v-html="formatMessage(message.text, store.users, store.channels)"
         />
-        <file-gallery v-if="message.files?.length" :files="message.files" />
-        <div v-if="message.reactions?.length" class="message-reactions">
+        <file-gallery v-if="message.files?.length" :files="message.files" :max-height="fileMaxHeight" />
+        <div v-if="message.reactions?.length || (message.replyCount && smallReplies)" class="message-reactions">
           <react-chip
             v-for="reaction in message.reactions"
             :key="reaction.name"
             :react="reaction"
           />
+          <div
+            v-if="message.replyCount && smallReplies"
+            :style="{ marginLeft: message.reactions?.length ? '16px' : '0' }"
+            class="small-replies"
+          >
+            <icon icon="mdi:message-reply-text-outline" />
+            <span>
+              {{ message.replyCount }}
+              {{ message.replyCount === 1 ? 'reply' : 'replies' }}
+            </span>
+          </div>
         </div>
         <replies-button
-          v-if="message.replyCount && !props.hideReplies"
+          v-if="message.replyCount && !props.hideReplies && !props.smallReplies"
           :message="message"
         />
       </div>
@@ -278,5 +299,26 @@ const copyLink = () => {
 }
 .message-content.just-emoji:deep(.emoji) {
   font-size: 36px;
+}
+
+.small-replies {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.small-replies:hover {
+  text-decoration: underline;
+}
+
+.small-replies .icon {
+  margin-right: 4px;
+}
+
+.message-reactions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 </style>

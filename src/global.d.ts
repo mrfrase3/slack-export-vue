@@ -39,9 +39,11 @@ declare global {
     id: number
     type: string
     userId?: string
+    channelId?: string
     user?: User
     text: string
     ts: number
+    tags: string[]
     isEdited?: boolean
     threadId?: number
     replyCount?: number

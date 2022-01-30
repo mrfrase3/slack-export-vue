@@ -19,6 +19,13 @@ const messageChunks = computed(() => {
   return chunk([...(channel.value?.rootMessages ?? [])].reverse(), step) as Message[][];
 });
 
+const threadRefMainId = computed(() => {
+  const threadRef = route.query.threadRef || '';
+  const message = store.messagesById[threadRef];
+  if (!message.threadId) return message.id;
+  return store.messagesById[`${channel.value.id}-${message.threadId}`]?.id;
+});
+
 const loadTopMessages = ($state: any) => {
   setTimeout(() => {
     if (!channel.value || !messageChunks.value[pageTop.value]) {
@@ -48,7 +55,7 @@ const loadBottomMessages = ($state: any) => {
     }
     const chunk = [...messageChunks.value[pageBottom.value]] as Message[];
     messages.value.push(...chunk.reverse());
-    pageBottom.value++;
+    pageBottom.value--;
     if (pageBottom.value <= 0) {
       $state.complete();
     } else {
@@ -60,15 +67,16 @@ const loadBottomMessages = ($state: any) => {
 const resetPaging = (force = false) => {
   let startPage = 0;
   const threadRef = `${route.query.threadRef}`;
+  let threadScroll = false;
   if (threadRef.startsWith(channel.value?.id) && messageChunks.value?.length && !force) {
-    const threadId = Number(threadRef.split('-')[1]);
     messageChunks.value.forEach((chunk, i) => {
-      if (chunk.some((m: Message) => m.id === threadId)) {
+      if (chunk.some((m: Message) => m.id === threadRefMainId.value)) {
         startPage = i;
       }
     });
+    threadScroll = true;
     setTimeout(() => {
-      const el = document.querySelector(`#message-${threadId}`);
+      const el = document.querySelector(`#message-${threadRefMainId.value}`);
       if (el) {
         el.scrollIntoView();
       }
@@ -78,7 +86,7 @@ const resetPaging = (force = false) => {
   pageBottom.value = startPage - 1;
   const chunk = (messageChunks.value[startPage] ? [...messageChunks.value[startPage]] : []) as Message[];
   messages.value = chunk.reverse();
-  if (force) {
+  if (!threadScroll) {
     nextTick(() => {
       const el = document.querySelector('#message-list-content');
       if (el) {
@@ -93,7 +101,8 @@ const aboveMessage = (i: number) => {
   return null;
 };
 
-watch(channel, () => {
+watch(channel, (to, from) => {
+  if (to?.id === from?.id) return;
   resetPaging();
 });
 

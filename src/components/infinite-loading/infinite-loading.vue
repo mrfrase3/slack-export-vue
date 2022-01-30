@@ -36,7 +36,7 @@ const params = computed(() => ({
 
 watch(state, (newVal) => {
   const el = (props.target && document.querySelector(props.target)) || document.documentElement;
-  if (newVal === 'loaded' && top) {
+  if (newVal === 'loaded' && props.top) {
     Promise.resolve().then(() => {
       el.scrollTop = el.scrollHeight - prevHeight.value;
     });

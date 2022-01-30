@@ -20,3 +20,9 @@ declare module 'v3-infinite-loading' {
 }
 
 declare module 'js-binary';
+
+declare module 'sanitize-html';
+
+declare module 'flexsearch';
+
+declare module 'debounce-promise';

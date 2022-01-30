@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { Archive } from 'libarchive.js/main.js';
 import sortBy from 'lodash/sortBy';
+import { Document } from 'flexsearch';
+import type { Content, JSONContent } from '@tiptap/vue-3';
 import binary from '../util/binary';
 
 Archive.init({
@@ -31,6 +33,7 @@ export const useStore = defineStore('store', {
     status: 'Loading...',
     users: {} as Record<string, User>,
     channels: [] as Channel[],
+    messagesById: {} as Record<string, Message>,
     exportConfig: {
       preferDisplayName: true,
       hideChannelMessages: true,
@@ -41,6 +44,22 @@ export const useStore = defineStore('store', {
     leftSidebar: false,
     deviceWidth: window.innerWidth,
     deviceType: getDeviceType(window.innerWidth),
+    activeSearch: {
+      type: 'oneLine',
+      content: [{
+        type: 'paragraph',
+      }],
+    } as Content,
+    lastMentionQuery: '',
+    messageIndex: new Document({
+      document: {
+        id: 'id',
+        tag: 'tag',
+        index: 'content',
+      },
+      worker: true,
+      charset: 'latin:advanced',
+    }),
   }),
 
   actions: {
@@ -68,6 +87,22 @@ export const useStore = defineStore('store', {
         const usersMap = {} as Record<string, User>;
         users.forEach((user: User) => { usersMap[user.id] = user; });
         this.users = usersMap;
+        this.status = 'Indexing...';
+        const docs = [] as any[];
+        const messagesById = {} as Record<string, Message>;
+        channels.forEach((channel: Channel) => {
+          channel.messages.forEach((message: Message) => {
+            if (message.type.startsWith('bot') || !message.userId) return;
+            docs.push({
+              id: `${message.channelId}-${message.id}`,
+              tag: message.tags,
+              content: message.text.replace(/(<[^>]+>)|\*|_|•|◦|▪︎/g, ''),
+            });
+            messagesById[`${message.channelId}-${message.id}`] = message;
+          });
+        });
+        sortBy(docs, (d: any) => Number(d.id.split('-')[1]) * -1).forEach((doc: any) => this.messageIndex.add(doc));
+        this.messagesById = messagesById;
         this.status = 'Done';
         this.dataLoaded = true;
       } catch (e: any) {
@@ -87,13 +122,25 @@ export const useStore = defineStore('store', {
       };
     },
 
-    processMessage(message: any): Message {
+    processMessage(message: any, channel: any): Message {
+      const tags = [];
+      const type = message.subtype || message.type || 'message';
+      if (!type?.startsWith('bot') && message.user) {
+        tags.push(`in:${channel.id}`);
+        if (message.user) tags.push(`from:${message.user}`);
+        message.text.match(/<@(U[\w]+)>/g)?.forEach((mention: string) => {
+          const userId = mention.replace(/<@(U[\w]+)>/, '$1');
+          tags.push(`mentions:${userId}`);
+        });
+      }
       return {
         id: ts(message.ts),
-        type: message.subtype || message.type || 'message',
+        type,
         text: message.text?.trim() || '',
         userId: message.user,
+        channelId: channel.id,
         ts: ts(message.ts),
+        tags,
         isEdited: !!message.edited,
         threadId: message.parent_user_id ? ts(message.thread_ts) : undefined,
         replyCount: message.reply_count || message.replies?.length,
@@ -137,7 +184,7 @@ export const useStore = defineStore('store', {
         topic: channel.topic?.value,
         purpose: channel.purpose?.value,
         // pinnedMessageIds: channel.pins?.map((i: any) => ts(i.created)),
-        messages: channel.messages?.map((m: any) => this.processMessage(m)) || [],
+        messages: channel.messages?.map((m: any) => this.processMessage(m, channel)) || [],
       };
     },
 
@@ -163,7 +210,7 @@ export const useStore = defineStore('store', {
             messages.push(
               ...dateMessages
                 .filter((m: any) => !m.subtype?.startsWith('channel_') || !this.exportConfig.hideChannelMessages)
-                .map((m: any) => this.processMessage(m)),
+                .map((m: any) => this.processMessage(m, c)),
             );
           }));
           c.messages = sortBy(messages, 'ts');
@@ -220,6 +267,63 @@ export const useStore = defineStore('store', {
     onWidthChange() {
       this.deviceWidth = window.innerWidth;
       this.deviceType = getDeviceType(this.deviceWidth);
+    },
+
+    searchUsers(query: string) {
+      this.lastMentionQuery = query;
+      return sortBy(
+        Object.values(this.users).filter((u: User) => u.name.toLowerCase().includes(query.toLowerCase())),
+        [(u: User) => u.name.toLowerCase().indexOf(query.toLowerCase()), (u: User) => u.name.toLowerCase()],
+      );
+    },
+
+    searchChannels(query: string) {
+      this.lastMentionQuery = query;
+      return sortBy(
+        this.channels.filter((c: Channel) => c.name.toLowerCase().includes(query.toLowerCase())),
+        [(c: Channel) => c.name.toLowerCase().indexOf(query.toLowerCase()), (c: Channel) => c.name.toLowerCase()],
+      );
+    },
+
+    async searchMessages(query: string | JSONContent[], limit = 50, offset = 0) {
+      let searchText = '';
+      const tags = [] as string[];
+      if (typeof query === 'string') {
+        query.match(/((mentions)|(from)|(in)):\w+/g)?.forEach((tag) => {
+          tags.push(tag);
+        });
+        searchText = query.replace(/((mentions)|(from)|(in)):\w+/g, '');
+      } else {
+        query.forEach((content) => {
+          if (content.type === 'text') {
+            searchText += content.text;
+          } else if (content.type === 'mention') {
+            if (content.attrs?.id) tags.push(content.attrs?.id);
+          }
+        });
+      }
+      searchText = searchText.replace(/(\s{2,})|\+/g, ' ').trim() || '';
+      let bool = 'and';
+      if (tags.filter(t => t.startsWith('from:')).length > 1) bool = 'or';
+      if (tags.filter(t => t.startsWith('in:')).length > 1) bool = 'or';
+      if (!searchText && !tags.length) return [];
+      // the flexsearch library forces to index by tags if there's no searchText
+      // so we find them ourselves, which is probably faster anyway
+      if (!searchText) {
+        const results = [] as Message[];
+        Object.values(this.messagesById).forEach((m: Message) => {
+          if (tags[bool === 'and' ? 'every' : 'some']((t: string) => m.tags.includes(t))) results.push(m);
+        });
+        return sortBy(results, (m: Message) => m.ts * -1).slice(offset, offset + limit);
+      }
+      const results = await this.messageIndex.searchAsync({
+        query: searchText,
+        limit,
+        offset,
+        ...(tags.length ? { index: 'content', tag: tags, bool } : {}),
+      });
+      const ids = results[0]?.result || [] as string[];
+      return ids.map((id: string) => this.messagesById[id]);
     },
   },
 });

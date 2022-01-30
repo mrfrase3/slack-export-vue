@@ -3,6 +3,7 @@
 const props = defineProps<{
   file: FileObject
   maxWidth?: number
+  maxHeight?: number
 }>();
 
 const type = computed(() => {
@@ -16,7 +17,7 @@ const src = computed(() => {
 const style = computed(() => {
   if (!props.file.width || !props.file.height || !props.maxWidth) return {};
   const maxWidth = props.maxWidth;
-  const maxHeight = 360;
+  const maxHeight = props.maxHeight || 360;
   const fileWidth = props.file.width;
   const fileHeight = props.file.height;
   const ratio = fileWidth / fileHeight;
@@ -30,13 +31,17 @@ const style = computed(() => {
 </script>
 
 <template>
-  <div class="file-preview">
+  <div class="file-preview" :style="maxHeight ? { maxHeight: `${maxHeight}px` } : {}">
     <video v-if="type === 'video'" :src="src" controls :style="style" />
-    <a v-else :href="src" target="_blank">
+    <a v-else :href="src" target="_blank" @click.stop="">
       <img v-if="type === 'image'" :src="src" :alt="props.file.name" :style="style">
-      <div v-else class="unknown-preview">
+      <div
+        v-else
+        :style="maxHeight ? { height: `${maxHeight}px`, width: `${maxHeight}px` } : {}"
+        class="unknown-preview"
+      >
         <icon icon="mdi:file-download-outline" style="font-size: 48px;" />
-        <div class="file-name">{{ props.file.name }}</div>
+        <div v-if="!maxHeight || maxHeight > 150" class="file-name">{{ props.file.name }}</div>
       </div>
     </a>
   </div>

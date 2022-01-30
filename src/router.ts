@@ -9,6 +9,11 @@ export default createRouter({
       component: () => import('./views/Home.vue'),
     },
     {
+      path: '/search',
+      name: 'search',
+      component: () => import('./views/Search.vue'),
+    },
+    {
       path: '/channel/:channelId',
       name: 'channel',
       component: () => import('./views/Channel.vue'),
