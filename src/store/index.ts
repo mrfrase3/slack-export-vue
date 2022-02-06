@@ -142,6 +142,7 @@ export const useStore = defineStore('store', {
         ts: ts(message.ts),
         tags,
         isEdited: !!message.edited,
+        editedAt: message.edited?.ts ? ts(message.edited.ts) : undefined,
         threadId: message.parent_user_id ? ts(message.thread_ts) : undefined,
         replyCount: message.reply_count || message.replies?.length,
         replyUsersCount: message.reply_users_count || message.replies_users?.length,

@@ -18,8 +18,10 @@ const unescapeText = (text: string) => {
 };
 
 const ulSplitRegExp = /(-|\* |•|◦|▪︎)/;
+const olSplitRegExp = /(\d+\.)/;
 
 const parseText = (text: string, users: any, channels: any[]) => {
+  // console.log(text);
   return unescapeText(text.trim()
     .replace(/((\n|^)\s*(-|\* |•|◦|▪︎)[^\n]+)+/g, (match: string) => {
       const lines = match.split('\n').filter(Boolean);
@@ -40,17 +42,39 @@ const parseText = (text: string, users: any, channels: any[]) => {
         return html;
       }).join('');
     })
-    .replace(/<@(U[\w]+)>/g, (match: string, userId: string) => {
+    .replace(/((\n|^)\s*(\d+\.)[^\n]+)+/g, (match: string) => {
+      const lines = match.split('\n').filter(Boolean);
+      return lines.map((line: string, i: number) => {
+        let html = '';
+        const aboveLine = lines[i - 1];
+        // const belowLine = lines[i + 1];
+        const isFirstLine = i === 0;
+        const isLastLine = i === lines.length - 1;
+        if (aboveLine && count(aboveLine, olSplitRegExp) !== count(line, olSplitRegExp)) html += '</ul>';
+        if (isFirstLine || count(aboveLine, olSplitRegExp) !== count(line, olSplitRegExp)) {
+          html += `<ul class="formatter-ol" data-indent="${Math.round(count(line, olSplitRegExp) / 4)}">`;
+        }
+        html += `<li data-num="${`${line}`.match(/(\d+\.)/)?.[0] ?? `${i + 1}.`}">${line.split(olSplitRegExp)[2].trim()}</li>`;
+        if (isLastLine) {
+          html += '</ul>';
+        }
+        return html;
+      }).join('');
+    })
+    .replace(/((\n|^)(>)[^\n]+)+\n?/g, (match: string) => {
+      return `<blockquote class="formatter-bq">${match.replace(/(\n|^)(>)/g, '\n').trim()}</blockquote>`;
+    })
+    .replace(/<@(U[\w]+)\|?([^>]+)?>/g, (match: string, userId: string, alt: string) => {
       const user = users[userId];
       const name = user.profile?.display_name || user.profile?.real_name || user.name;
-      return escapeText(user ? `<span class="formatter-mention">@${name}</span>` : match);
+      return escapeText(user ? `<span class="formatter-mention">@${alt || name}</span>` : match);
     })
-    .replace(/<!([\w\^]+)>/g, (match: string, mention: string) => {
-      return escapeText(`<span class="formatter-mention">@${mention}</span>`);
+    .replace(/<!([\w\^]+\|?([^>]+)?)>/g, (match: string, mention: string, alt: string) => {
+      return escapeText(`<span class="formatter-mention">@${alt || mention}</span>`);
     })
-    .replace(/<#(C[\w\^\|]+)>/g, (match: string, channelId: string) => {
+    .replace(/<#(C[\w\^]+)\|?([^>]+)?>/g, (match: string, channelId: string, alt: string) => {
       const channel = channels.find((c: any) => channelId.startsWith(c.id));
-      return escapeText(channel ? `<a class="formatter-mention" href="#${channel.name}">#${channel.name}</a>` : match);
+      return escapeText(channel ? `<a class="formatter-mention" href="/channel/${channel.id}">#${alt || channel.name}</a>` : match);
     })
     .replace(/<((https?:\/\/|mailto:|tel:)[^<|>]+)\|?([^<>]+)?>/g, (match: string, href: string, proto: string, alt: string) => {
       return escapeText(`<a class="formatter-link" href="${href}" target="_blank">${alt || href}</a>`);
@@ -68,13 +92,13 @@ const parseText = (text: string, users: any, channels: any[]) => {
 export default (text: string, users: any, channels: any[]) => {
   return text.split('```').map((block: string, i: number) => {
     if (i % 2 === 0) {
-      return text.split('`').map((part: string, j: number) => {
-        if (j % 2 === 0) {
-          return parseText(part, users, channels);
-        } else {
-          return `<code class="formatter-code inline">${part}</code>`;
-        }
-      }).join('');
+      const inlines = [] as string[];
+      const escaped = block.replace(/(`[^`]+`)/g, (match: string) => {
+        inlines.push(`<code class="formatter-code inline">${match.replace(/(^`)|(`$)/g, '')}</code>`);
+        return `---inline-code-${inlines.length - 1}---`;
+      });
+      const parsed = parseText(escaped, users, channels);
+      return inlines.reduce((acc, inline, i) => acc.replace(`---inline-code-${i}---`, inline), parsed);
     }
     return `<pre class="formatter-code block"><code>${block}</code></pre>`;
   }).join('');

@@ -77,6 +77,10 @@ const showActions = computed(() => {
   return !props.message.threadId;
 });
 
+const editedAt = computed(() => {
+  return dayjs(props.message.editedAt || 0).format('MMM Do, YYYY [at] h:mm a');
+});
+
 const copyLink = () => {
   const link = `${window.location.origin}/channel/${props.channelId}?threadRef=${props.channelId}-${props.message.id}`;
   navigator.clipboard.writeText(link);
@@ -85,6 +89,8 @@ const copyLink = () => {
     copyCopy.value = 'Copy Link';
   }, 2000);
 };
+
+const showRawModal = process.env.NODE_ENV === 'development';
 
 </script>
 
@@ -108,6 +114,19 @@ const copyLink = () => {
             </div>
           </template>
         </Popper>
+        <Popper v-if="showRawModal" content="Raw Message Data" placement="top" hover arrow>
+          <modal>
+            <template #activator="{ on }">
+              <button class="copy-link-btn" v-on="on">
+                <icon icon="mdi:code-json" />
+              </button>
+            </template>
+            <template #header>
+              <h3>Raw Message Data</h3>
+            </template>
+            <pre class="formatter-code block"><code v-text="JSON.stringify(message, null, 2)" /></pre>
+          </modal>
+        </Popper>
       </div>
       <div class="message-left">
         <div v-if="!isContinued" class="message-avatar">
@@ -127,8 +146,13 @@ const copyLink = () => {
         <div
           v-if="message.text"
           :class="{ 'message-content': true, 'just-emoji': justEmoji, 'non-message': message.type !== 'message' }"
-          v-html="formatMessage(message.text, store.users, store.channels)"
-        />
+        >
+          <!-- eslint-disable-next-line vue/no-lone-template -->
+          <div style="display:inline;" v-html="formatMessage(message.text, store.users, store.channels)" />
+          <Popper v-if="message.isEdited" :content="editedAt" placement="top" arrow hover>
+            <span class="message-edited">&nbsp;(editied)&nbsp;</span>
+          </Popper>
+        </div>
         <file-gallery v-if="message.files?.length" :files="message.files" :max-height="fileMaxHeight" />
         <div v-if="message.reactions?.length || (message.replyCount && smallReplies)" class="message-reactions">
           <react-chip
@@ -299,6 +323,11 @@ const copyLink = () => {
 }
 .message-content.just-emoji:deep(.emoji) {
   font-size: 36px;
+}
+
+.message-edited {
+  color: #999;
+  font-size: 14px;
 }
 
 .small-replies {

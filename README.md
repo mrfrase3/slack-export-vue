@@ -29,16 +29,18 @@ Currently to use it, you need to:
   - [ ] Allow externally linking to a user profile view
 - [x] Switch to pre-processing the export and save it as a [binary file](https://github.com/sitegui/js-binary)
   - [x] Unpack binary file instead, regress data structure
-    - [x] zip binary file for even more compression (10MB export.zip -> 1.1MB export.bin -> 0.3MB export.bin.zip 😗👌)
+    - [x] zip binary file for even more compression (2.2MB export.zip -> 1.1MB export.bin -> 0.3MB export.bin.zip 😗👌)
   - [x] Make sure sensitive data is not exposed (slack exports emails and phone numbers, etc)
   - [x] Have a UI flow for creating the binary, with config options
 - [x] Propperly setup types with typescript
 - [x] Setup a Linter :/
 - [ ] Finish message rendering
-  - [ ] Support ordered lists
-  - [ ] Support Blockquotes
-  - [ ] Fix code blocks
+  - [x] Support ordered lists
+  - [x] Support Blockquotes
+  - [x] Fix code blocks
+  - [ ] (optional) [Date formatting](https://api.slack.com/reference/surfaces/formatting#date-formatting)
   - [ ] Support Attachments (link previews and quoting earlier messages)
+  - [x] Display `(edited)` on edited messages
 - [ ] Add docker config for pre-processing/deploying
 - [x] Add a logo/favicon
 

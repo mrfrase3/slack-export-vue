@@ -45,6 +45,7 @@ declare global {
     ts: number
     tags: string[]
     isEdited?: boolean
+    editedAt?: number
     threadId?: number
     replyCount?: number
     replyUsersCount?: number

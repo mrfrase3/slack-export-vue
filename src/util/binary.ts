@@ -26,6 +26,7 @@ export default new Type({
       'ts': 'uint',
       'tags': ['string'],
       'isEdited': 'boolean',
+      'editedAt?': 'uint',
       'threadId?': 'uint',
       'replyCount?': 'uint',
       'replyUsersCount?': 'uint',
