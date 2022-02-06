@@ -106,6 +106,9 @@ watch(isOpen, (val) => {
 
 .modal-body {
   margin: 20px 0;
+  max-height: 70vh;
+  overflow-y: overlay;
+  overflow-y: auto;
 }
 
 .modal-default-button {

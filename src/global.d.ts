@@ -30,7 +30,16 @@ declare global {
     titleUrl?: string
     text?: string
     thumbUrl?: string
+    thumbWidth?: number
+    thumbHeight?: number
     imageUrl?: string
+    imageWidth?: number
+    imageHeight?: number
+    authorName?: string
+    authorUrl?: string
+    videoHtml?: string
+    videoWidth?: number
+    videoHeight?: number
     quoteId?: number
     channelId?: string
   }

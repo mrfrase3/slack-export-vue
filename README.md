@@ -39,7 +39,7 @@ Currently to use it, you need to:
   - [x] Support Blockquotes
   - [x] Fix code blocks
   - [ ] (optional) [Date formatting](https://api.slack.com/reference/surfaces/formatting#date-formatting)
-  - [ ] Support Attachments (link previews and quoting earlier messages)
+  - [x] Support Attachments (link previews and quoting earlier messages)
   - [x] Display `(edited)` on edited messages
 - [ ] Add docker config for pre-processing/deploying
 - [x] Add a logo/favicon

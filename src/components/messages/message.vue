@@ -154,6 +154,14 @@ const showRawModal = process.env.NODE_ENV === 'development';
           </Popper>
         </div>
         <file-gallery v-if="message.files?.length" :files="message.files" :max-height="fileMaxHeight" />
+        <div v-if="message.attachments?.length" class="message-attachments">
+          <message-attachment
+            v-for="(attachment, i) in message.attachments"
+            :key="i"
+            :attachment="attachment"
+            :msg="message"
+          />
+        </div>
         <div v-if="message.reactions?.length || (message.replyCount && smallReplies)" class="message-reactions">
           <react-chip
             v-for="reaction in message.reactions"

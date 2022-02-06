@@ -15,6 +15,7 @@ declare module 'vue' {
     LoadSplash: typeof import('./src/components/nav/load-splash.vue')['default']
     MentionList: typeof import('./src/components/search/mention-list.vue')['default']
     Message: typeof import('./src/components/messages/message.vue')['default']
+    MessageAttachment: typeof import('./src/components/messages/message-attachment.vue')['default']
     MessageFormatModal: typeof import('./src/components/messages/message-format-modal.vue')['default']
     MessagesList: typeof import('./src/components/messages/messages-list.vue')['default']
     Modal: typeof import('./src/components/nav/modal.vue')['default']
