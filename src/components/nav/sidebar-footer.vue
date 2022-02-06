@@ -16,7 +16,7 @@ const resetExport = () => {
 <template>
   <div class="sidebar-footer">
     <popper
-      v-if="store.binarySource === 'upload' || true"
+      v-if="store.binarySource === 'upload'"
       content="Download Binary"
       placement="top"
       hover arrow

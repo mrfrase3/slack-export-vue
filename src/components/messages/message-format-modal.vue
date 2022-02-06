@@ -61,7 +61,7 @@ const addShout = () => {
 
 <style scoped>
 .textarea {
-  width: 100%;
+  width: 95%;
   margin-top: 32px;
 }
 </style>

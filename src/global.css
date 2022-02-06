@@ -41,6 +41,9 @@
   background-color: transparent;
   color: inherit;
 }
+.btn.btn-text:hover {
+  background-color: rgba(0,0,0, 0.1);
+}
 
 .btn.btn-icon {
   background-color: transparent;

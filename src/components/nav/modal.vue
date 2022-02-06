@@ -61,7 +61,8 @@ watch(isOpen, (val) => {
 
           <div class="modal-footer">
             <slot name="footer">
-              <button class="modal-default-button" @click="toggleOpen(false)">
+              <div class="spacer" />
+              <button class="modal-default-button btn btn-text" @click="toggleOpen(false)">
                 Close
               </button>
             </slot>
@@ -105,15 +106,16 @@ watch(isOpen, (val) => {
 }
 
 .modal-body {
-  margin: 20px 0;
+  padding: 20px 0;
   max-height: 70vh;
   overflow-y: overlay;
   overflow-y: auto;
 }
 
-.modal-default-button {
-  display: block;
-  margin-top: 1rem;
+.modal-footer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 /*
