@@ -28,6 +28,7 @@ export const useStore = defineStore('store', {
   state: () => ({
     dataLoaded: false,
     exportNeeded: false,
+    exportUrl: localStorage.getItem('exportUrl') || null,
     binaryData: null as null | Buffer,
     binarySource: 'download',
     status: 'Loading...',
@@ -78,11 +79,16 @@ export const useStore = defineStore('store', {
           const binFile = dir['export.bin'] as File;
           this.binaryData = Buffer.from(await binFile.arrayBuffer());
           this.binarySource = 'download';
+          if (url) this.setExportUrl(url);
         } else {
           this.binarySource = 'upload';
+          this.setExportUrl(null);
         }
         this.status = 'Extracting...';
         const { channels, users } = await binary.decode(this.binaryData);
+        this.channels = [];
+        this.users = {};
+        this.messagesById = {};
         this.channels = channels.map((c: Channel) => ({ ...c, rootMessages: c.messages?.filter((m: Message) => !m.threadId) }));
         const usersMap = {} as Record<string, User>;
         users.forEach((user: User) => { usersMap[user.id] = user; });
@@ -246,7 +252,7 @@ export const useStore = defineStore('store', {
         const binFile = await dir['export.bin']?.extract() as File;
         this.binaryData = Buffer.from(await binFile.arrayBuffer());
         this.exportNeeded = false;
-        this.loadBinary();
+        await this.loadBinary();
         return true;
       } catch (e: any) {
         return false;
@@ -281,6 +287,12 @@ export const useStore = defineStore('store', {
     onWidthChange() {
       this.deviceWidth = window.innerWidth;
       this.deviceType = getDeviceType(this.deviceWidth);
+    },
+
+    setExportUrl(url: string | null) {
+      this.exportUrl = url;
+      if (url) localStorage.setItem('exportUrl', url);
+      else localStorage.removeItem('exportUrl');
     },
 
     searchUsers(query: string) {

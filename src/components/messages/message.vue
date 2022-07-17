@@ -82,7 +82,8 @@ const editedAt = computed(() => {
 });
 
 const copyLink = () => {
-  const link = `${window.location.origin}/channel/${props.channelId}?threadRef=${props.channelId}-${props.message.id}`;
+  let link = `${window.location.origin}/channel/${props.channelId}?threadRef=${props.channelId}-${props.message.id}`;
+  if (store.exportUrl) link += `&exportUrl=${encodeURIComponent(store.exportUrl)}`;
   navigator.clipboard.writeText(link);
   copyCopy.value = 'Copied!';
   setTimeout(() => {

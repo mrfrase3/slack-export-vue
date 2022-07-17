@@ -12,7 +12,13 @@
   --color-primary-rgb: 72, 20, 72; /* not a trademarked color :) */
   --color-primary: rgb(var(--color-primary-rgb));
 
+  --color-success: #4caf50;
+
   --navbar-height: 38px;
+}
+
+.success-text {
+  color: var(--color-success);
 }
 
 .btn {
@@ -157,3 +163,17 @@ img.emoji {
 	height: 1em;
 }
 
+input[type="text"] {
+  font-size: inherit;
+  border: 1px solid #2c3e50;
+  border-radius: 4px;
+  margin: 8px 0;
+  outline: none;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+}

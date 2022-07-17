@@ -1,11 +1,15 @@
 <script lang="ts" setup>
+import Popper from 'vue3-popper';
 
 const store = useStore();
+const route = useRoute();
+const router = useRouter();
 const file = ref(null as null | File);
 const isDragging = ref(false);
 const isValidDrag = ref(false);
 const showInvalid = ref(false);
 const isChecking = ref(false);
+const customUrl = ref('');
 
 const zipIcon = computed(() => {
   if (showInvalid.value) return 'mdi:alert-outline';
@@ -71,8 +75,20 @@ const onDemo = async() => {
   await store.loadBinary('/demo.bin.zip');
 };
 
-onMounted(() => {
-  store.loadBinary();
+const onCustom = async() => {
+  if (!customUrl.value) return;
+  await store.loadBinary(customUrl.value);
+};
+
+onMounted(async() => {
+  await router.isReady();
+  const url = route.query?.exportUrl || store.exportUrl;
+  await store.loadBinary(url);
+  if (route.query?.exportUrl) {
+    const query = { ...route.query };
+    delete query.exportUrl;
+    router.replace({ query });
+  }
 });
 
 </script>
@@ -129,7 +145,23 @@ onMounted(() => {
           <small>Please try again</small>
         </div>
       </div>
-      <div v-show="!file" class="actions demo">
+      <div v-show="!file" class="actions upload">
+        <div class="input-group">
+          <input
+            v-model="customUrl"
+            type="text"
+            placeholder="Use Hosted Binary URL"
+            @keypress.enter.prevent="onCustom"
+          >
+          <div>
+            <popper content="Fetch Binary" placement="top" hover arrow>
+              <button class="btn btn-icon" @click="onCustom">
+                <icon icon="mdi:arrow-right-thick" />
+              </button>
+            </popper>
+          </div>
+        </div>
+        <div class="spacer" />
         <button class="btn btn-text" @click="onDemo">
           <span>Load Demo Export</span>
         </button>
@@ -291,7 +323,17 @@ onMounted(() => {
   margin-top: 16px;
 }
 
-.actions.demo {
+.actions.upload {
   justify-content: center;
+  margin-top: 64px;
+}
+
+.actions.upload input {
+  border-color: var(--color-primary);
+  background: #ffffff20;
+  color: #fff;
+}
+.actions.upload input::placeholder {
+  color: #ffffffcc;
 }
 </style>
