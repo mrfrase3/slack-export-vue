@@ -54,6 +54,7 @@ const context = computed(() => {
 </script>
 
 <template>
+  <chat-header title="" show-menu-button />
   <div class="home-wrap">
     <h1>Welcome to Slax Pro</h1>
     <p>A <i>Free &amp; Professional</i> viewer for slack-like export content.</p>
