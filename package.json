@@ -8,6 +8,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@faker-js/faker": "^7.3.0",
     "@iconify/vue": "^3.1.2",
     "@tiptap/extension-document": "^2.0.0-beta.15",
     "@tiptap/extension-mention": "^2.0.0-beta.95",

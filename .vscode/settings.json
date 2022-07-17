@@ -1,4 +1,7 @@
 {
   "vetur.validation.script": false,
-  "vetur.validation.template": false
+  "vetur.validation.template": false,
+  "cSpell.words": [
+    "deidentify"
+  ]
 }

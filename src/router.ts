@@ -18,5 +18,14 @@ export default createRouter({
       name: 'channel',
       component: () => import('./views/Channel.vue'),
     },
+    ...(process.env.NODE_ENV === 'development'
+      ? [
+        {
+          path: '/deidentify',
+          name: 'deidentify',
+          component: () => import('./views/Deidentify.vue'),
+        },
+      ]
+      : []),
   ],
 });

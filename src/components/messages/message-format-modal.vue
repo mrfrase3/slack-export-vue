@@ -5,6 +5,7 @@ import sample from 'lodash/sample';
 const store = useStore();
 
 const text = ref('');
+
 const msg = computed(() => ({
   ...(store.channels?.[0]?.rootMessages?.[0] || {}),
   text: text.value,
@@ -25,13 +26,9 @@ const addShout = () => {
 </script>
 
 <template>
-  <modal>
+  <modal v-bind="$attrs">
     <template #activator="{ on }">
-      <slot name="activator" :on="on">
-        <button v-on="on">
-          Format Preview
-        </button>
-      </slot>
+      <slot name="activator" :on="on" />
     </template>
     <template #header>
       <h3>Format Previewer</h3>

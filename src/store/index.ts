@@ -63,11 +63,11 @@ export const useStore = defineStore('store', {
   }),
 
   actions: {
-    async loadBinary() {
+    async loadBinary(url?: string) {
       try {
         if (!this.binaryData) {
           this.status = 'Downloading...';
-          const res = await fetch('/export.bin.zip');
+          const res = await fetch(url || '/export.bin.zip');
           if (!res.ok) {
             this.exportNeeded = true;
             this.status = 'Waiting for export';
@@ -231,6 +231,10 @@ export const useStore = defineStore('store', {
         this.status = `Error: ${e.message}`;
         console.error(e);
       }
+    },
+
+    async updateBinary(channels: Channel[], users: User[]) {
+      this.binaryData = await binary.encode({ channels, users });
     },
 
     async checkIfBinZip(file: File) {

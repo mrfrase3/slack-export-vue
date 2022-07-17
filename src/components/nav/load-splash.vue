@@ -67,6 +67,10 @@ const onExport = async() => {
   }
 };
 
+const onDemo = async() => {
+  await store.loadBinary('/demo.bin.zip');
+};
+
 onMounted(() => {
   store.loadBinary();
 });
@@ -124,6 +128,11 @@ onMounted(() => {
           <br>
           <small>Please try again</small>
         </div>
+      </div>
+      <div v-show="!file" class="actions demo">
+        <button class="btn btn-text" @click="onDemo">
+          <span>Load Demo Export</span>
+        </button>
       </div>
       <div v-show="file" class="config">
         <h2>Export Preferences</h2>
@@ -280,5 +289,9 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+
+.actions.demo {
+  justify-content: center;
 }
 </style>
