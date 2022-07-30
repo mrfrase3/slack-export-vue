@@ -59,6 +59,7 @@ const style = computed(() => {
 .file-preview a {
   display: inline-block;
   height: 100%;
+  max-height: inherit;
   color: inherit;
   text-decoration: none;
 }
@@ -69,6 +70,7 @@ const style = computed(() => {
 
 .file-preview video {
   height: 100%;
+  max-height: inherit;
   max-width: 100%;
   overflow: hidden;
   border: 1px solid #ddd;
@@ -76,7 +78,7 @@ const style = computed(() => {
 }
 
 .file-preview img {
-  max-height: 100%;
+  max-height: inherit;
   max-width: 100%;
   overflow: hidden;
   border: 1px solid #ddd;

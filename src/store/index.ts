@@ -131,7 +131,7 @@ export const useStore = defineStore('store', {
     processMessage(message: any, channel: any): Message {
       const tags = [];
       const type = message.subtype || message.type || 'message';
-      if (!type?.startsWith('bot') && message.user) {
+      if (!type?.startsWith('bot') && message.user && message.text) {
         tags.push(`in:${channel.id}`);
         if (message.user) tags.push(`from:${message.user}`);
         message.text.match(/<@(U[\w]+)>/g)?.forEach((mention: string) => {
